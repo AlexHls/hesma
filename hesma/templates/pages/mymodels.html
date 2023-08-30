@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">My models</h1>
+      <p class="landing-main-text">
+        Here you can find all your models. You can make changes to your models by clicking the model below.
+      </p>
+    </div>
+  </section>
+  <section class="landing-section langing-features">
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Hydro</span>dynamical simulation data
+      </h2>
+      <ul>
+        {% for model in hydro_models %}
+          <li>
+            <a href="{% url 'hydro:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+          </li>
+        {% empty %}
+          You currently do not have any hydro simulations.
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Tracer</span>-particles for nuclear post-processing
+      </h2>
+      <ul>
+        {% for model in tracer_models %}
+          <li>
+            <a href="{% url 'tracer:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+          </li>
+        {% empty %}
+          You currently do not have any tracer particles.
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Radiative</span>-transfer simulations and synthetic observables
+      </h2>
+      <ul>
+        {% for model in rt_models %}
+          <li>
+            <a href="{% url 'rt:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+          </li>
+        {% empty %}
+          You currently do not have any radiative-transfer simulations.
+        {% endfor %}
+      </ul>
+    </section>
+  </section>
+{% endblock content %}

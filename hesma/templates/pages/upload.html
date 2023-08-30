@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load auth_extras %}
+
+{% block content %}
+  <div class="container btn-container">
+    <h1>Which kind of model do you want to upload?</h1>
+    <div class="container">
+      <div class="upload-btn">
+        {% if request.user|has_group:"hydro_user" %}
+          <a href="{% url 'hydro:hydro_upload' %}" class="btn btn-primary">Hydro model</a>
+        {% else %}
+          <a href="{{ url_accept }}" class="btn btn-secondary disabled">Hydro model</a>
+        {% endif %}
+      </div>
+      <div class="upload-btn">
+        {% if request.user|has_group:"tracer_user" %}
+          <a href="{% url 'tracer:tracer_upload' %}" class="btn btn-primary">Tracer model</a>
+        {% else %}
+          <a href="{{ url_accept }}" class="btn btn-secondary disabled">Tracer model</a>
+        {% endif %}
+      </div>
+      <div class="upload-btn">
+        {% if request.user|has_group:"rt_user" %}
+          <a href="{% url 'rt:rt_upload' %}" class="btn btn-primary">RT model</a>
+        {% else %}
+          <a href="{{ url_accept }}" class="btn btn-secondary disabled">RT model</a>
+        {% endif %}
+      </div>
+    </div>
+    <div class="container">
+      <p>Don't have access to the model you want to upload? Contact the administrator.</p>
+    </div>
+  </div>
+{% endblock content %}

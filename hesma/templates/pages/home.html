@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">HESMA</h1>
+      <h2>
+        <span class="brand-text">HE</span>idelberg
+        <span class="brand-text">S</span>upernova
+        <span class="brand-text">M</span>odel
+        <span class="brand-text">A</span>rchive
+      </h2>
+      <p class="landing-main-text">
+        The Heidelber Supernova Model Archive is a database collecting various data from supernova simulations.
+        Here you can find simulation snapshots, post-processed data, initial conditions and more.
+        We provide data from hydrodynamical simulations, tracer-particle data for nuclear post-processing and radiative-transfer simulations.
+      </p>
+      <p class="landing-main-text">
+        If you want to make your own simulations available through this archive, please contact us at <a href="mailto:hesma@h-its.org">hesma@h-its.org</a> and we will provide you with the means to upload your data to HEASMA.
+      </p>
+      <p class="landing-main-text">
+        If you make use of the data provided through this website in publications, please cite the original authors and add the following acknowledgements: “This work made use of the Heidelberg Supernova Model Archive (HESMA), <a href="https://hesma.h-its.org">https://hesma.h-its.org</a>.”
+      </p>
+    </div>
+  </section>
+  <section class="landing-section langing-features">
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Hydro</span>dynamical simulation data
+      </h2>
+      <ul>
+        <li>
+          <a href={% url 'hydro' %} class="landing-link">Hydro Models</a>
+        </li>
+      </ul>
+    </section>
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Tracer</span>-particles for nuclear post-processing
+      </h2>
+      <ul>
+        <li>
+          <a href={% url 'tracer' %} class="landing-link">Tracer</a>
+        </li>
+      </ul>
+    </section>
+    <section class="landing-feature">
+      <h2>
+        <span class="brand-text">Radiative</span>-transfer simulations and synthetic observables
+      </h2>
+      <ul>
+        <li>
+          <a href={% url 'rt' %} class="landing-link">RT Data</a>
+        </li>
+      </ul>
+    </section>
+  </section>
+{% endblock content %}

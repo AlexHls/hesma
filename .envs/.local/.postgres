@@ -1,0 +1,7 @@
+# PostgreSQL
+# ------------------------------------------------------------------------------
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=hesma
+POSTGRES_USER=HqmDpLcKzFKSJKbzsoYhxmCaFmXPKMFQ
+POSTGRES_PASSWORD=yETDxUVlDtnhugUgYQrHihLDn3Tto2LjxeyV8MHRDJChv3dUuIfGR3qhHrf6PTxr

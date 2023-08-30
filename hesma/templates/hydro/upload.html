@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% load auth_extras %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">HESMA Hydro Models</h1>
+      <p class="landing-main-text">
+        Upload your hydrodynamical simulation to the HESMA database. Please read the FAQ before uploading.
+      </p>
+    </div>
+  </section>
+  <div class="landing-section-content">
+    <h2>Upload model:</h2>
+    <p>Please enter simulation details below. You will be able to upload the model files in the next step.</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Submit" />
+    </form>
+  </div>
+{% endblock content %}

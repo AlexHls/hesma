@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">HESMA Hydro Models</h1>
+      <p class="landing-main-text">Here your can find various hydrodynamical simulations.</p>
+    </div>
+  </section>
+  <div class="landing-section-content">
+    <h2>Recent models:</h2>
+    {% if latest_model_list %}
+      <ul>
+        {% for model in latest_model_list %}
+          <li>
+            <a href="{% url 'hydro:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No recent models are available.</p>
+    {% endif %}
+  </div>
+{% endblock content %}

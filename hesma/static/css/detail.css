@@ -1,0 +1,9 @@
+.detail-section-content {
+  padding: 2rem 0;
+  background: var(--color-secondary);
+  display: flex;
+  align-items: left;
+  justify-content: left;
+  flex-direction: column;
+  color: var(--color-white);
+}

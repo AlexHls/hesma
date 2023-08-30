@@ -1,0 +1,40 @@
+:root {
+  --color-primary: #fca311;
+  --color-secondary: #14213d;
+  --color-white: #ffffff;
+  --color-gray: #e5e5e5;
+  --color-black: #000000;
+}
+
+.nav-link {
+  color: var(--color-white) !important;
+}
+.navbar-brand {
+  color: var(--color-primary);
+}
+.bg-light {
+  background-color: var(--color-secondary) !important;
+}
+ul {
+  list-style-type: square;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  padding: 3rem;
+}
+.btn-container {
+  margin-right: auto;
+  margin-left: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  text-align: center;
+  align-content: center;
+}
+.upload-btn {
+  display: inline-block;
+  text-align: center;
+}
+.hits_logo {
+  width: 300px;
+}

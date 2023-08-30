@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% load auth_extras %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">HESMA Hydro Models</h1>
+      <p class="landing-main-text">Edit your RT simulation in the HESMA database. Please read the FAQ before editing.</p>
+    </div>
+  </section>
+  <div class="landing-section-content">
+    <h2>Edit model {{ model.name }}:</h2>
+    <p>Please enter new simulation details below.</p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input class="btn btn-primary" type="submit" value="Submit" />
+    </form>
+  </div>
+{% endblock content %}

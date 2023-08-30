@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">FAQ</h1>
+      <p class="landing-main-text">
+        We aim to answer some of the most common questions about the data here.
+        <br />
+        If you have any further questions, please contact us.
+      </p>
+    </div>
+  </section>
+  <section class="landing-section langing-features">
+    {% for topic in topics %}
+      <section class="landing-feature">
+        <h2>
+          <span class="brand-text">{{ topic.name }}</span>
+        </h2>
+        <dl>
+          {% for question in topic.questions %}
+            <dt>
+              <b>{{ question.question }}</b>
+            </dt>
+            <dd>
+              {{ question.answer }}
+            </dd>
+          {% endfor %}
+        </dl>
+      </section>
+    {% endfor %}
+  </section>
+{% endblock content %}
