@@ -52,3 +52,11 @@ The following details how to deploy this application.
 ### Docker
 
 See detailed [cookiecutter-django Docker documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
+
+### User groups
+
+After the initial setup, some user groups need to be defined in the admin interface. If these groups are not set the upload sites will not work properly.
+The groups that need to be set up are:
+ - hydro_user
+ - tracer_user
+ - rt_user
