@@ -53,6 +53,26 @@ The following details how to deploy this application.
 
 See detailed [cookiecutter-django Docker documentation](http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html).
 
+### File storage setup
+
+Per default, all files will be stored in the ``MEDIA_ROOT`` directory in the default container volume. For larger files, it might be desirable to store them in a separate directory.
+Specific directories for the different models can be setup by specifying e.g. the ``META_DATA_DIR`` in the respective ``.env`` file (relative paths will still be relative to the ``MEDIA_ROOT`` directory).
+Additional volumes can be mounted following the standard Docker procedures.
+In particular, if files should be stored in a location outside the container context, a bind mount has to be set up. (This might be desirable for extremely large files for which e.g. a backup is unfeasible.) To do so, add e.g. a
+
+```yaml
+
+    volumes:
+      - .:/app:z # The default location. Do not remove
+      - type: bind
+        source: /path/to/docker_bind_vol
+        target: /data
+```
+
+section to the django service of your compose file.
+In the example above you would add ``META_DATA_DIR=/data/meta_data`` to your django ``.env`` file to store all meta data files in ``/path/to/docker_bind_vol/meta_data``.
+
+
 ### User groups
 
 After the initial setup, some user groups need to be defined in the admin interface. If these groups are not set the upload sites will not work properly.
