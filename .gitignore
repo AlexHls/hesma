@@ -272,6 +272,7 @@ dump.rdb
 
 ### Project template
 hesma/media/
+meta_data
 
 .pytest_cache/
 .ipython/
