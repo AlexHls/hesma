@@ -278,3 +278,6 @@ hesma/media/
 .env
 .envs/*
 !.envs/.local/
+
+# VS Code
+.vscode/
