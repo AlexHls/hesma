@@ -91,7 +91,7 @@ def tracer_download_info(request, tracersimulation_id):
 def tracer_edit(request, tracersimulation_id):
     model = TracerSimulation.objects.get(id=tracersimulation_id)
     if request.method == "POST":
-        form = TracerSimulationForm(request.POST, request.FILES)
+        form = TracerSimulationForm(request.POST, request.FILES, instance=model)
         if form.is_valid():
             sim = form.save(commit=False)
             sim.save()
