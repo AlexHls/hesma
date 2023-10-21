@@ -272,9 +272,13 @@ dump.rdb
 
 ### Project template
 hesma/media/
+meta_data
 
 .pytest_cache/
 .ipython/
 .env
 .envs/*
 !.envs/.local/
+
+# VS Code
+.vscode/

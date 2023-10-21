@@ -23,6 +23,9 @@ class TracerSimulation(models.Model):
         return self.name
 
     def was_published_recently(self):
+        # Return False if the date is in the future
+        if self.date > timezone.now():
+            return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
 
 
