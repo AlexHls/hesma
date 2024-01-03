@@ -78,6 +78,7 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "cookie_consent",
+    "bootstrap_modal_forms",
 ]
 
 LOCAL_APPS = [
