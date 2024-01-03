@@ -27,6 +27,8 @@
     </div>
     <button id="create-doi" class="btn btn-primary" type="button" name="button">Create DOI</button>
   </div>
+{% endblock content %}
+{% block inline_javascript %}
   <script type="text/javascript">
     // BS4
     $(document).ready(function() {
@@ -42,4 +44,4 @@
       })
     });
   </script>
-{% endblock content %}
+{% endblock inline_javascript %}

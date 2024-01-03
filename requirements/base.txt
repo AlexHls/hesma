@@ -16,3 +16,4 @@ crispy-bootstrap5==0.7  # https://github.com/django-crispy-forms/crispy-bootstra
 django-redis==5.4.0  # https://github.com/jazzband/django-redis
 django-cookie-consent==0.4.0 # https://github.com/jazzband/django-cookie-consent
 django-bootstrap-modal-forms==3.0.3 # https://github.com/trco/django-bootstrap-modal-forms
+django-widget-tweaks==1.5.0 # https://github.com/jazzband/django-widget-tweaks
