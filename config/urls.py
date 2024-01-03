@@ -7,8 +7,16 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path("legalnotice/", TemplateView.as_view(template_name="pages/legalnotice.html"), name="legalnotice"),
-    path("privacy/", TemplateView.as_view(template_name="pages/privacy.html"), name="privacy"),
+    path(
+        "legalnotice/",
+        TemplateView.as_view(template_name="pages/legalnotice.html"),
+        name="legalnotice",
+    ),
+    path(
+        "privacy/",
+        TemplateView.as_view(template_name="pages/privacy.html"),
+        name="privacy",
+    ),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
@@ -19,7 +27,12 @@ urlpatterns = [
     path("hydro/", include("hesma.hydro.urls", namespace="hydro")),
     path("rt/", include("hesma.rt.urls", namespace="rt")),
     path("tracer/", include("hesma.tracer.urls", namespace="tracer")),
-    path("upload/", TemplateView.as_view(template_name="pages/upload.html"), name="upload"),
+    path(
+        "upload/",
+        TemplateView.as_view(template_name="pages/upload.html"),
+        name="upload",
+    ),
+    path("meta/", include("hesma.meta.urls", namespace="meta")),
     # Cookie Consent
     path("cookies/", include("cookie_consent.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

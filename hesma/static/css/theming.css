@@ -38,3 +38,10 @@ ul {
 .hits_logo {
   width: 300px;
 }
+
+.modal-title {
+  color: var(--color-primary);
+}
+.modal-body {
+  color: var(--color-secondary);
+}

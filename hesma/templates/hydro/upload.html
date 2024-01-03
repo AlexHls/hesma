@@ -19,5 +19,27 @@
       {{ form.as_p }}
       <input class="btn btn-primary" type="submit" value="Submit" />
     </form>
+    <p>If you can't find the correct DOI for your model, you can add it to the database here:</p>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+      </div>
+    </div>
+    <button id="create-doi" class="btn btn-primary" type="button" name="button">Create DOI</button>
   </div>
+  <script type="text/javascript">
+    // BS4
+    $(document).ready(function() {
+      $("#create-doi").modalForm({
+        formURL: "{% url 'meta:doi_create' %}",
+      });
+    });
+
+    // BS5
+    document.addEventListener('DOMContentLoaded', (e) => {
+      modalForm(document.getElementById('create-doi'), {
+        formURL: "{% url 'meta:doi_create' %}",
+      })
+    });
+  </script>
 {% endblock content %}
