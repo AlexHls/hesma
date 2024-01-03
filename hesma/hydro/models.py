@@ -6,6 +6,7 @@ from django.forms import ModelForm
 from django.utils import timezone
 
 from config.settings.base import meta_fs
+from hesma.meta.models import DOI
 
 
 class HydroSimulation(models.Model):
@@ -16,6 +17,7 @@ class HydroSimulation(models.Model):
     author = models.CharField(max_length=300, blank=True)
 
     readme = models.FileField(storage=meta_fs, blank=True)
+    doi = models.ManyToManyField(DOI, blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
