@@ -85,6 +85,7 @@ LOCAL_APPS = [
     "hesma.users",
     # Your stuff: custom apps go here
     "hesma.pages.apps.PagesConfig",
+    "hesma.meta.apps.MetaConfig",
     "hesma.hydro.apps.HydroConfig",
     "hesma.tracer.apps.TracerConfig",
     "hesma.rt.apps.RtConfig",
