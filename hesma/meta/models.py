@@ -12,6 +12,7 @@ class DOI(models.Model):
 
     class Meta:
         ordering = ["-created"]
+        verbose_name = "DOI"
 
 
 class DOIForm(BSModalModelForm):

@@ -1,6 +1,8 @@
 import datetime
 
+from django import forms
 from django.conf import settings
+from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db import models
 from django.forms import ModelForm
 from django.utils import timezone
@@ -17,7 +19,7 @@ class HydroSimulation(models.Model):
     author = models.CharField(max_length=300, blank=True)
 
     readme = models.FileField(storage=meta_fs, blank=True)
-    doi = models.ManyToManyField(DOI, blank=True)
+    doi = models.ManyToManyField(DOI, blank=True, name="DOI")
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
@@ -36,3 +38,13 @@ class HydroSimulationForm(ModelForm):
         model = HydroSimulation
         fields = "__all__"
         exclude = ["user", "date"]
+
+    class Media:
+        css = {"all": ("admin/css/widgets.css",)}
+        js = ("admin/jsi18n",)
+
+    DOI = forms.ModelMultipleChoiceField(
+        queryset=DOI.objects.all(),
+        widget=FilteredSelectMultiple("DOI", is_stacked=False),
+        label="DOI",
+    )

@@ -1,0 +1,19 @@
+.selector h2 {
+  font-size: 16px !important;
+}
+
+.selector-available, .selector-chosen {
+  width: 380px;
+  text-align: center;
+  margin-bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--color-border);
+  border-radius: 4px 4px 0 0;
+}
+
+th, td {
+  width: 150px;
+  text-align: left;
+  padding: 10px
+}

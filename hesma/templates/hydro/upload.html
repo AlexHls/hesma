@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load auth_extras %}
+{% load widget_tweaks %}
 
 {% block content %}
   <section class="landing-section landing-main">
@@ -16,7 +17,11 @@
     <p>Please enter simulation details below. You will be able to upload the model files in the next step.</p>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      {{ form.as_p }}
+      <table>
+        {{ form.media }}
+        {{ form.as_table }}
+        <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+      </table>
       <input class="btn btn-primary" type="submit" value="Submit" />
     </form>
     <p>If you can't find the correct DOI for your model, you can add it to the database here:</p>
