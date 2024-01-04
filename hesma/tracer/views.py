@@ -8,7 +8,8 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.tracer.models import TracerSimulation, TracerSimulationForm
+from hesma.tracer.forms import TracerSimulationForm
+from hesma.tracer.models import TracerSimulation
 
 
 def tracer_landing_view(request):

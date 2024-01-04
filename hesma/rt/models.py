@@ -2,10 +2,10 @@ import datetime
 
 from django.conf import settings
 from django.db import models
-from django.forms import ModelForm
 from django.utils import timezone
 
 from config.settings.base import meta_fs
+from hesma.meta.models import DOI, Keyword
 
 
 class RTSimulation(models.Model):
@@ -16,6 +16,8 @@ class RTSimulation(models.Model):
     author = models.CharField(max_length=300, blank=True)
 
     readme = models.FileField(storage=meta_fs, blank=True)
+    doi = models.ManyToManyField(DOI, blank=True, name="DOI")
+    keywords = models.ManyToManyField(Keyword, blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 
@@ -27,10 +29,3 @@ class RTSimulation(models.Model):
         if self.date > timezone.now():
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
-
-
-class RTSimulationForm(ModelForm):
-    class Meta:
-        model = RTSimulation
-        fields = "__all__"
-        exclude = ["user", "date"]

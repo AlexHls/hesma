@@ -8,7 +8,8 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.rt.models import RTSimulation, RTSimulationForm
+from hesma.rt.forms import RTSimulationForm
+from hesma.rt.models import RTSimulation
 
 
 def rt_landing_view(request):

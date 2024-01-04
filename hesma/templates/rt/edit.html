@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% load auth_extras %}
+{% load widget_tweaks %}
 
 {% block content %}
   <section class="landing-section landing-main">
@@ -14,8 +15,56 @@
     <p>Please enter new simulation details below.</p>
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      {{ form.as_p }}
+      <table>
+        {{ form.media }}
+        {{ form.as_table }}
+        <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+      </table>
       <input class="btn btn-primary" type="submit" value="Submit" />
     </form>
+    <p>If you can't find the correct DOI for your model, you can add it to the database here:</p>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+      </div>
+    </div>
+    <button id="create-doi" class="btn btn-primary" type="button" name="button">Create DOI</button>
+    <p>If you need more keywords, you can add them here:</p>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+      </div>
+    </div>
+    <button id="create-keyword"
+            class="btn btn-primary"
+            type="button"
+            name="button">Create Keyword</button>
   </div>
 {% endblock content %}
+{% block inline_javascript %}
+  <script type="text/javascript">
+    // BS4
+    $(document).ready(function() {
+      $("#create-doi").modalForm({
+        formURL: "{% url 'meta:doi_create_rt_edit' %}",
+      });
+    });
+    $(document).ready(function() {
+      $("#create-keyword").modalForm({
+        formURL: "{% url 'meta:keyword_create_rt_edit' %}",
+      });
+    });
+
+    // BS5
+    document.addEventListener('DOMContentLoaded', (e) => {
+      modalForm(document.getElementById('create-doi'), {
+        formURL: "{% url 'meta:doi_create_rt_edit' %}",
+      })
+    });
+    document.addEventListener('DOMContentLoaded', (e) => {
+      modalForm(document.getElementById('create-keyword'), {
+        formURL: "{% url 'meta:keyword_create_rt_edit' %}",
+      })
+    });
+  </script>
+{% endblock inline_javascript %}

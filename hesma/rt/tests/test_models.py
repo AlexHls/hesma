@@ -4,13 +4,18 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
-from hesma.rt.models import RTSimulation, RTSimulationForm
+from hesma.meta.models import DOI, Keyword
+from hesma.rt.models import RTSimulation
 from hesma.users.models import User
 
 
 class RTSimulationModelTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
+        self.doi = DOI.objects.create(
+            doi="https://doi.org/10.48550/arXiv.2310.19669",
+        )
+        self.keyword = Keyword.objects.create(keyword="Test Keyword")
         self.simulation = RTSimulation.objects.create(
             name="Test Simulation",
             description="This is a test simulation",
@@ -18,6 +23,8 @@ class RTSimulationModelTestCase(TestCase):
             date=timezone.now(),
             readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         )
+        self.simulation.DOI.add(self.doi)
+        self.simulation.keywords.add(self.keyword)
 
     def test_rts_simulation_str(self):
         self.assertEqual(str(self.simulation), "Test Simulation")
@@ -35,29 +42,3 @@ class RTSimulationModelTestCase(TestCase):
             date=time,
         )
         self.assertFalse(future_simulation.was_published_recently())
-
-
-class RTSimulationFormTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-
-    def test_rts_simulation_form_valid(self):
-        form_data = {
-            "name": "Test Simulation",
-            "description": "This is a test simulation",
-            "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-            "user": self.user,
-        }
-        form = RTSimulationForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-    def test_rts_simulation_form_invalid(self):
-        form_data = {
-            "name": "",
-            "description": "This is a test simulation",
-            "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-            "user": self.user,
-        }
-        form = RTSimulationForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["name"], ["This field is required."])
