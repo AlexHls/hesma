@@ -20,4 +20,5 @@ class HydroSimulationForm(ModelForm):
         queryset=DOI.objects.all(),
         widget=FilteredSelectMultiple("DOI", is_stacked=False),
         label="DOI",
+        required=False,
     )

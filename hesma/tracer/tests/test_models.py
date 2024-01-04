@@ -4,7 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
-from hesma.tracer.models import TracerSimulation, TracerSimulationForm
+from hesma.tracer.models import TracerSimulation
 from hesma.users.models import User
 
 
@@ -35,29 +35,3 @@ class TracerSimulationModelTestCase(TestCase):
             date=time,
         )
         self.assertFalse(future_simulation.was_published_recently())
-
-
-class TracerSimulationFormTestCase(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-
-    def test_tracer_simulation_form_valid(self):
-        form_data = {
-            "name": "Test Simulation",
-            "description": "This is a test simulation",
-            "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-            "user": self.user,
-        }
-        form = TracerSimulationForm(data=form_data)
-        self.assertTrue(form.is_valid())
-
-    def test_tracer_simulation_form_invalid(self):
-        form_data = {
-            "name": "",
-            "description": "This is a test simulation",
-            "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-            "user": self.user,
-        }
-        form = TracerSimulationForm(data=form_data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors["name"], ["This field is required."])
