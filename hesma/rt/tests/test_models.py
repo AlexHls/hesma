@@ -4,6 +4,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.utils import timezone
 
+from hesma.meta.models import DOI
 from hesma.rt.models import RTSimulation
 from hesma.users.models import User
 
@@ -11,6 +12,9 @@ from hesma.users.models import User
 class RTSimulationModelTestCase(TestCase):
     def setUp(self):
         self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
+        self.doi = DOI.objects.create(
+            doi="https://doi.org/10.48550/arXiv.2310.19669",
+        )
         self.simulation = RTSimulation.objects.create(
             name="Test Simulation",
             description="This is a test simulation",
@@ -18,6 +22,7 @@ class RTSimulationModelTestCase(TestCase):
             date=timezone.now(),
             readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         )
+        self.simulation.DOI.add(self.doi)
 
     def test_rts_simulation_str(self):
         self.assertEqual(str(self.simulation), "Test Simulation")
