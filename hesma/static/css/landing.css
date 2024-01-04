@@ -62,3 +62,25 @@
   color: var(--color-black);
   text-decoration: none;
 }
+
+.landing-news {
+  border: 2px solid var(--color-primary);
+  border-radius: 5px;
+  padding: 1rem;
+  margin: 1rem;
+}
+
+.landing-news-item {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-black);
+}
+
+.landing-news-date {
+  font-size: 0.8rem;
+  color: var(--color-black);
+}
+
+.landing-news-text {
+  font-size: 1.2rem;
+  color: var(--color-black);
+}
