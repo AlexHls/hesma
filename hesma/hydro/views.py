@@ -8,7 +8,8 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.hydro.models import HydroSimulation, HydroSimulationForm
+from hesma.hydro.forms import HydroSimulationForm
+from hesma.hydro.models import HydroSimulation
 
 
 def hydro_landing_view(request):

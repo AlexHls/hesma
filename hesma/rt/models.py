@@ -2,7 +2,6 @@ import datetime
 
 from django.conf import settings
 from django.db import models
-from django.forms import ModelForm
 from django.utils import timezone
 
 from config.settings.base import meta_fs
@@ -27,10 +26,3 @@ class RTSimulation(models.Model):
         if self.date > timezone.now():
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
-
-
-class RTSimulationForm(ModelForm):
-    class Meta:
-        model = RTSimulation
-        fields = "__all__"
-        exclude = ["user", "date"]

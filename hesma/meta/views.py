@@ -1,7 +1,7 @@
 from bootstrap_modal_forms.generic import BSModalCreateView
 from django.urls import reverse_lazy
 
-from hesma.meta.models import DOIForm
+from hesma.meta.forms import DOIForm
 
 
 class DOICreateViewHydro(BSModalCreateView):

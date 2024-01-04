@@ -1,10 +1,7 @@
 import datetime
 
-from django import forms
 from django.conf import settings
-from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.db import models
-from django.forms import ModelForm
 from django.utils import timezone
 
 from config.settings.base import meta_fs
@@ -31,20 +28,3 @@ class HydroSimulation(models.Model):
         if self.date > timezone.now():
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
-
-
-class HydroSimulationForm(ModelForm):
-    class Meta:
-        model = HydroSimulation
-        fields = "__all__"
-        exclude = ["user", "date"]
-
-    class Media:
-        css = {"all": ("admin/css/widgets.css",)}
-        js = ("admin/jsi18n",)
-
-    DOI = forms.ModelMultipleChoiceField(
-        queryset=DOI.objects.all(),
-        widget=FilteredSelectMultiple("DOI", is_stacked=False),
-        label="DOI",
-    )
