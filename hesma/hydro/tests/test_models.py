@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from hesma.hydro.models import HydroSimulation
-from hesma.meta.models import DOI
+from hesma.meta.models import DOI, Keyword
 from hesma.users.models import User
 
 
@@ -15,6 +15,7 @@ class HydroSimulationModelTestCase(TestCase):
         self.doi = DOI.objects.create(
             doi="https://doi.org/10.48550/arXiv.2310.19669",
         )
+        self.keyword = Keyword.objects.create(keyword="Test Keyword")
         self.simulation = HydroSimulation.objects.create(
             name="Test Simulation",
             description="This is a test simulation",
@@ -23,6 +24,7 @@ class HydroSimulationModelTestCase(TestCase):
             readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         )
         self.simulation.DOI.add(self.doi)
+        self.simulation.keywords.add(self.keyword)
 
     def test_hydro_simulation_str(self):
         self.assertEqual(str(self.simulation), "Test Simulation")

@@ -2,7 +2,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 
 from hesma.hydro.forms import HydroSimulationForm
-from hesma.meta.models import DOI
+from hesma.meta.models import DOI, Keyword
 from hesma.users.models import User
 
 
@@ -12,6 +12,7 @@ class HydroSimulationFormTestCase(TestCase):
         self.doi = DOI.objects.create(
             doi="https://doi.org/10.48550/arXiv.2310.19669",
         )
+        self.keyword = Keyword.objects.create(keyword="Test Keyword")
 
     def test_hydro_simulation_form_valid(self):
         form_data = {
@@ -20,6 +21,7 @@ class HydroSimulationFormTestCase(TestCase):
             "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
             "user": self.user,
             "DOI": [self.doi],
+            "keywords": [self.keyword],
         }
         form = HydroSimulationForm(data=form_data)
         self.assertTrue(form.is_valid())

@@ -34,4 +34,34 @@ urlpatterns = [
         views.DOICreateViewTracerEdit.as_view(),
         name="doi_create_tracer_edit",
     ),
+    path(
+        "keyword/create/hydro_upload",
+        views.KeywordCreateViewHydro.as_view(),
+        name="keyword_create_hydro",
+    ),
+    path(
+        "keyword/create/hydro_edit",
+        views.KeywordCreateViewHydroEdit.as_view(),
+        name="keyword_create_hydro_edit",
+    ),
+    path(
+        "keyword/create/rt_upload",
+        views.KeywordCreateViewRT.as_view(),
+        name="keyword_create_rt",
+    ),
+    path(
+        "keyword/create/rt_edit",
+        views.KeywordCreateViewRTEdit.as_view(),
+        name="keyword_create_rt_edit",
+    ),
+    path(
+        "keyword/create/tracer_upload",
+        views.KeywordCreateViewTracer.as_view(),
+        name="keyword_create_tracer",
+    ),
+    path(
+        "keyword/create/tracer_edit",
+        views.KeywordCreateViewTracerEdit.as_view(),
+        name="keyword_create_tracer_edit",
+    ),
 ]

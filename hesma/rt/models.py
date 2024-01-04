@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 
 from config.settings.base import meta_fs
-from hesma.meta.models import DOI
+from hesma.meta.models import DOI, Keyword
 
 
 class RTSimulation(models.Model):
@@ -17,6 +17,7 @@ class RTSimulation(models.Model):
 
     readme = models.FileField(storage=meta_fs, blank=True)
     doi = models.ManyToManyField(DOI, blank=True, name="DOI")
+    keywords = models.ManyToManyField(Keyword, blank=True)
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
 

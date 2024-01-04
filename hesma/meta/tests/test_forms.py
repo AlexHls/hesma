@@ -2,8 +2,8 @@ import datetime
 
 from django.test import TestCase
 
-from hesma.meta.forms import DOIForm
-from hesma.meta.models import DOI
+from hesma.meta.forms import DOIForm, KeywordForm
+from hesma.meta.models import DOI, Keyword
 
 
 class DOIFormTestCase(TestCase):
@@ -48,3 +48,22 @@ class DOIFormTestCase(TestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(form.errors["doi"], ["This DOI is already in the database."])
+
+
+class KeywordFormTestCase(TestCase):
+    def setUp(self):
+        self.keyword = Keyword.objects.create(keyword="Test Keyword")
+
+    def test_keyword_form_valid(self):
+        form = KeywordForm({"keyword": "Test Keyword 2"})
+        self.assertTrue(form.is_valid())
+
+    def test_keyword_form_invalid(self):
+        form = KeywordForm({"keyword": ""})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["keyword"], ["This field is required."])
+
+    def test_keyword_form_unique(self):
+        form = KeywordForm({"keyword": "Test Keyword"})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors["keyword"], ["This keyword is already in the database."])

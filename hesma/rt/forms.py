@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms import ModelForm
 
-from hesma.meta.models import DOI
+from hesma.meta.models import DOI, Keyword
 from hesma.rt.models import RTSimulation
 
 
@@ -20,5 +20,12 @@ class RTSimulationForm(ModelForm):
         queryset=DOI.objects.all(),
         widget=FilteredSelectMultiple("DOI", is_stacked=False),
         label="DOI",
+        required=False,
+    )
+
+    keywords = forms.ModelMultipleChoiceField(
+        queryset=Keyword.objects.all(),
+        widget=FilteredSelectMultiple("Keywords", is_stacked=False),
+        label="Keywords",
         required=False,
     )

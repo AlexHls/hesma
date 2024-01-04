@@ -31,6 +31,16 @@
       </div>
     </div>
     <button id="create-doi" class="btn btn-primary" type="button" name="button">Create DOI</button>
+    <p>If you need more keywords, you can add them here:</p>
+    <div class="modal fade" tabindex="-1" role="dialog" id="modal">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content"></div>
+      </div>
+    </div>
+    <button id="create-keyword"
+            class="btn btn-primary"
+            type="button"
+            name="button">Create Keyword</button>
   </div>
 {% endblock content %}
 {% block inline_javascript %}
@@ -41,11 +51,21 @@
         formURL: "{% url 'meta:doi_create_tracer' %}",
       });
     });
+    $(document).ready(function() {
+      $("#create-keyword").modalForm({
+        formURL: "{% url 'meta:keyword_create_tracer' %}",
+      });
+    });
 
     // BS5
     document.addEventListener('DOMContentLoaded', (e) => {
       modalForm(document.getElementById('create-doi'), {
         formURL: "{% url 'meta:doi_create_tracer' %}",
+      })
+    });
+    document.addEventListener('DOMContentLoaded', (e) => {
+      modalForm(document.getElementById('create-keyword'), {
+        formURL: "{% url 'meta:keyword_create_tracer' %}",
       })
     });
   </script>
