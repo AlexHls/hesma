@@ -36,3 +36,32 @@ This can be done in the docker container:
     ::
 
         docker run --rm docs make apidocs
+
+
+Database Documentation
+----------------------------------------------------------------------
+
+To backup the database, use the command::
+
+    export POSTGRES_BACKUP_DIR=<backup_dir>
+    ./scripts/backup_local.sh
+
+For the production enviroment use the ``backup_production.sh`` script instead.
+
+Restore the database from a backup file::
+
+    cat <backup_file> | docker exec -i hesma_local_postgres psql -U $POSTGRES_USER -d postgres
+
+The ``$POSTGRES_USER`` is set in the ``.envs/.local/.postgres`` file.
+For the production enviroment the database name and user have to be adapted.
+
+To enable the database backup as a cron job, add the following line to the crontab (e.g. ``/etc/crontab`` or ``/var/spool/cron/username``)::
+
+    0 2 * * * /path/to/backup_production.sh
+
+This will backup the database every day at 2am.
+Alternatively, create an executable file in ``/etc/cron.daily`` with the content::
+
+    #!/bin/sh
+    export POSTGRES_BACKUP_DIR=/path/to/backup/dir
+    /path/to/backup_production.sh
