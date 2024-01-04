@@ -38,14 +38,14 @@
     // BS4
     $(document).ready(function() {
       $("#create-doi").modalForm({
-        formURL: "{% url 'meta:doi_create' %}",
+        formURL: "{% url 'meta:doi_create_hydro' %}",
       });
     });
 
     // BS5
     document.addEventListener('DOMContentLoaded', (e) => {
       modalForm(document.getElementById('create-doi'), {
-        formURL: "{% url 'meta:doi_create' %}",
+        formURL: "{% url 'meta:doi_create_hydro' %}",
       })
     });
   </script>

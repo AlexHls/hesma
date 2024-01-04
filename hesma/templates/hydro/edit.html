@@ -33,3 +33,20 @@
     <button id="create-doi" class="btn btn-primary" type="button" name="button">Create DOI</button>
   </div>
 {% endblock content %}
+{% block inline_javascript %}
+  <script type="text/javascript">
+    // BS4
+    $(document).ready(function() {
+      $("#create-doi").modalForm({
+        formURL: "{% url 'meta:doi_create_hydro_edit' %}",
+      });
+    });
+
+    // BS5
+    document.addEventListener('DOMContentLoaded', (e) => {
+      modalForm(document.getElementById('create-doi'), {
+        formURL: "{% url 'meta:doi_create_hydro_edit' %}",
+      })
+    });
+  </script>
+{% endblock inline_javascript %}

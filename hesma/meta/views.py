@@ -9,3 +9,10 @@ class DOICreateViewHydro(BSModalCreateView):
     form_class = DOIForm
     success_message = "Success: DOI was created."
     success_url = reverse_lazy("hydro:hydro_upload")
+
+
+class DOICreateViewHydroEdit(BSModalCreateView):
+    template_name = "meta/create_doi.html"
+    form_class = DOIForm
+    success_message = "Success: DOI was created."
+    success_url = reverse_lazy("hydro:hydro_edit")
