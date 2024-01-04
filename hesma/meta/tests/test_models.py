@@ -2,7 +2,7 @@ import datetime
 
 from django.test import TestCase
 
-from hesma.meta.models import DOI
+from hesma.meta.models import DOI, Keyword
 
 
 class DOITestCase(TestCase):
@@ -31,3 +31,19 @@ class DOITestCase(TestCase):
                 title="Test Title 2",
                 date=datetime.date.today(),
             )
+
+
+class KeywordTestCase(TestCase):
+    def setUp(self):
+        self.keyword = Keyword.objects.create(keyword="Test Keyword")
+
+    def test_keyword_str(self):
+        self.assertEqual(str(self.keyword), "Test Keyword")
+
+    def test_keyword_creation(self):
+        self.assertIsInstance(self.keyword, Keyword)
+        self.assertEqual(self.keyword.keyword, "Test Keyword")
+
+    def test_keyword_unique(self):
+        with self.assertRaises(Exception):
+            DOI.objects.create(keyword="Test Keyword")

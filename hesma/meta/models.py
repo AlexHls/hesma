@@ -15,3 +15,10 @@ class DOI(models.Model):
     class Meta:
         ordering = ["-created"]
         verbose_name = "DOI"
+
+
+class Keyword(models.Model):
+    keyword = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return f"{self.keyword}"
