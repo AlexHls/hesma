@@ -23,7 +23,7 @@
               <b>{{ question.question }}</b>
             </dt>
             <dd>
-              {{ question.answer }}
+              {{ question.answer|safe }}
             </dd>
           {% endfor %}
         </dl>

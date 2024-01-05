@@ -21,20 +21,17 @@
         If you want to make your own simulations available through this archive, please contact us at <a href="mailto:hesma@h-its.org">hesma@h-its.org</a> and we will provide you with the means to upload your data to HEASMA.
       </p>
       <p class="landing-main-text">
-        If you make use of the data provided through this website in publications, please cite the original authors and add the following acknowledgements: “This work made use of the Heidelberg Supernova Model Archive (HESMA), <a href="https://hesma.h-its.org">https://hesma.h-its.org</a>.”
+        If you make use of the data provided through this website in publications, please cite the original authors (<a href="https://arxiv.org/abs/1706.09879">arXiv:1706.09879</a>) and add the following acknowledgements: “This work made use of the Heidelberg Supernova Model Archive (HESMA), <a href="https://hesma.h-its.org">https://hesma.h-its.org</a>.”
       </p>
     </div>
   </section>
   <section class="landing-news">
     <h2>News</h2>
     <p class="landing-news-item">
-      <span class="landing-news-date">2021-05-01</span>
-      <span class="landing-news-text">
-        The HESMA website is now online! This is an alpha version, so please report any bugs you find on our <a href="https://github.com/AlexHls/hesma/issues">GitHub page</a>.
-        More features will be added in the near future.
-        We are still working on migrating data from the old website, so please be patient. In case you need data that is not yet available on the new website, you can
-        find the old website <a href="https://old-hesma.h-its.org">here</a>.
-      </span>
+      {% for news in news_list %}
+        <span class="landing-news-date">{{ news.date }}</span>
+        <span class="landing-news-text">{{ news.content|safe }}</span>
+      {% endfor %}
     </p>
   </section>
   <section class="landing-section langing-features">

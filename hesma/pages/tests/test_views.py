@@ -4,8 +4,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 from hesma.hydro.models import HydroSimulation
-from hesma.pages.models import FAQ, FAQTopic
-from hesma.pages.views import faq_view, mymodel_view
+from hesma.pages.models import FAQ, FAQTopic, News
+from hesma.pages.views import faq_view, home_view, mymodel_view
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
 from hesma.users.models import User
@@ -68,3 +68,57 @@ class MyModelViewTestCase(TestCase):
         self.assertContains(response, "Test Hydro Model")
         self.assertContains(response, "Test RT Model")
         self.assertContains(response, "Test Tracer Model")
+
+
+class HomeViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.news = [
+            {
+                "title": "Test News 1",
+                "content": "This is test news 1",
+                "date": timezone.now(),
+            },
+            {
+                "title": "Test News 2",
+                "content": "This is test news 2",
+                "date": timezone.now(),
+            },
+            {
+                "title": "Test News 3",
+                "content": "This is test news 3",
+                "date": timezone.now(),
+            },
+            {
+                "title": "Test News 4",
+                "content": "This is test news 4",
+                "date": timezone.now(),
+            },
+            {
+                "title": "Test News 5",
+                "content": "This is test news 5",
+                "date": timezone.now(),
+            },
+            {
+                "title": "Test News 6",
+                "content": "This is test news 6",
+                "date": timezone.now(),
+            },
+        ]
+        for news in self.news:
+            News.objects.create(
+                title=news["title"],
+                content=news["content"],
+                date=news["date"],
+            )
+
+    def test_home_view(self):
+        request = self.factory.get(reverse("home"))
+        response = home_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This is test news 1")
+        self.assertContains(response, "This is test news 2")
+        self.assertContains(response, "This is test news 3")
+        self.assertContains(response, "This is test news 4")
+        self.assertContains(response, "This is test news 5")
+        self.assertNotContains(response, "This is test news 6")

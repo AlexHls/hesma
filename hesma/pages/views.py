@@ -1,9 +1,14 @@
 from django.shortcuts import render
 
 from hesma.hydro.models import HydroSimulation
-from hesma.pages.models import FAQ, FAQTopic
+from hesma.pages.models import FAQ, FAQTopic, News
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
+
+
+def home_view(request):
+    news = News.objects.order_by("-date")[:5]
+    return render(request, "pages/home.html", {"news_list": news})
 
 
 def faq_view(request):
