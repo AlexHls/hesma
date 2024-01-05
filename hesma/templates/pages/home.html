@@ -28,13 +28,10 @@
   <section class="landing-news">
     <h2>News</h2>
     <p class="landing-news-item">
-      <span class="landing-news-date">2021-05-01</span>
-      <span class="landing-news-text">
-        The HESMA website is now online! This is an alpha version, so please report any bugs you find on our <a href="https://github.com/AlexHls/hesma/issues">GitHub page</a>.
-        More features will be added in the near future.
-        We are still working on migrating data from the old website, so please be patient. In case you need data that is not yet available on the new website, you can
-        find the old website <a href="https://old-hesma.h-its.org">here</a>.
-      </span>
+      {% for news in news_list %}
+        <span class="landing-news-date">{{ news.date }}</span>
+        <span class="landing-news-text">{{ news.content|safe }}</span>
+      {% endfor %}
     </p>
   </section>
   <section class="landing-section langing-features">
