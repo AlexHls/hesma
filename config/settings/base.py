@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 APPS_DIR = BASE_DIR / "hesma"
 env = environ.Env()
 
-READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=True)
 if READ_DOT_ENV_FILE:
     # OS environment variables take precedence over variables from .env
     env.read_env(str(BASE_DIR / ".env"))
@@ -298,3 +298,11 @@ meta_fs = FileSystemStorage(location=META_DATA_DIR)
 # Hydro data directory for storing larger files (e.g. snapshots)
 HYDRO_DATA_DIR = env.str("HYDRO_DATA_DIR", default="hydro_data/")
 hydro_fs = FileSystemStorage(location=HYDRO_DATA_DIR)
+
+# Tracer data directory for storing larger files (e.g. snapshots)
+TRACER_DATA_DIR = env.str("TRACER_DATA_DIR", default="tracer_data/")
+tracer_fs = FileSystemStorage(location=TRACER_DATA_DIR)
+
+# RT data directory for storing larger files (e.g. snapshots)
+RT_DATA_DIR = env.str("RT_DATA_DIR", default="rt_data/")
+rt_fs = FileSystemStorage(location=RT_DATA_DIR)
