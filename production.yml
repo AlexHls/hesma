@@ -15,6 +15,9 @@ services:
     image: hesma_production_django
     volumes:
       - production_django_media:/app/hesma/media
+      - type: bind
+        source: /var/www/hesma_data
+        target: /data
     depends_on:
       - postgres
       - redis
