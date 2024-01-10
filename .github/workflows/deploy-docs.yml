@@ -51,7 +51,7 @@ jobs:
         run: |
           tar \
             --dereference --hard-dereference \
-            --directory "docs/build/html/" \
+            --directory "docs/_build/html/" \
             -cvf "$RUNNER_TEMP/github-pages.tar" \
             .
       - name: Setup Pages
@@ -59,7 +59,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: 'docs/build/html/'
+          path: 'docs/_build/html/'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
