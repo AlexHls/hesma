@@ -12,17 +12,19 @@
 
 import os
 import sys
-import django
 
 if os.getenv("READTHEDOCS", default=False) == "True":
+    import django
+
     sys.path.insert(0, os.path.abspath(".."))
     os.environ["DJANGO_READ_DOT_ENV_FILE"] = "True"
     os.environ["USE_DOCKER"] = "no"
+    os.environ["DATABASE_URL"] = "sqlite:///readthedocs.db"
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+    django.setup()
 else:
     sys.path.insert(0, os.path.abspath("/app"))
-os.environ["DATABASE_URL"] = "sqlite:///readthedocs.db"
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
-django.setup()
+
 
 # -- Project information -----------------------------------------------------
 
@@ -37,8 +39,8 @@ author = "Alexander Holas"
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
+    "sphinx_copybutton",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -54,7 +56,9 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "alabaster"
+html_theme = "furo"
+html_static_path = ["_static"]
+html_favicon = "_static/favicon.ico"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
