@@ -11,7 +11,6 @@ Welcome to Hesma's documentation!
    :caption: Contents:
 
    howto
-   users
 
 
 
