@@ -34,10 +34,13 @@ echo "Updating the local cluster..."
 git fetch origin
 git pull origin main
 
+echo "Building the local cluster..."
+docker compose -f production.yml build
+
 echo "Applying migrations..."
 docker compose -f production.yml run django python manage.py migrate
 
 echo "Starting the local cluster..."
-docker compose -f production.yml up -d --build
+docker compose -f production.yml up -d
 
 echo "Update complete!"
