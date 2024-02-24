@@ -125,9 +125,7 @@ PASSWORD_HASHERS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -293,6 +291,7 @@ SOCIALACCOUNT_FORMS = {"signup": "hesma.users.forms.UserSocialSignupForm"}
 # Chunk size used in streaming responses
 STREAMING_CHUNK_SIZE = env.int("STREAMING_CHUNK_SIZE", default=8192)
 
+# File system storage
 # Meta data directory for storing smaller files (e.g. README's)
 meta_fs = FileSystemStorage(location="/data/meta_data/")
 
