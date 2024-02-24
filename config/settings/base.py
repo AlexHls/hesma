@@ -274,7 +274,10 @@ ACCOUNT_AUTHENTICATION_METHOD = "username"
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_REQUIRED = True
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "optional"
+verify_email = env("DJANGO_ACCOUNT_EMAIL_VERIFICATION", default="optional")
+if verify_email not in ["mandatory", "optional", "none"]:
+    raise ValueError("DJANGO_ACCOUNT_EMAIL_VERIFICATION must be one of 'mandatory', 'optional', or 'none'.")
+ACCOUNT_EMAIL_VERIFICATION = verify_email
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_ADAPTER = "hesma.users.adapters.AccountAdapter"
 # https://django-allauth.readthedocs.io/en/latest/forms.html
