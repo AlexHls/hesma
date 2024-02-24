@@ -125,7 +125,9 @@ PASSWORD_HASHERS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -292,17 +294,13 @@ SOCIALACCOUNT_FORMS = {"signup": "hesma.users.forms.UserSocialSignupForm"}
 STREAMING_CHUNK_SIZE = env.int("STREAMING_CHUNK_SIZE", default=8192)
 
 # Meta data directory for storing smaller files (e.g. README's)
-META_DATA_DIR = env.str("META_DATA_DIR", default="meta_data/")
-meta_fs = FileSystemStorage(location=META_DATA_DIR)
+meta_fs = FileSystemStorage(location="/data/meta_data/")
 
 # Hydro data directory for storing larger files (e.g. snapshots)
-HYDRO_DATA_DIR = env.str("HYDRO_DATA_DIR", default="hydro_data/")
-hydro_fs = FileSystemStorage(location=HYDRO_DATA_DIR)
+hydro_fs = FileSystemStorage(location="/data/hydro_data/")
 
 # Tracer data directory for storing larger files (e.g. snapshots)
-TRACER_DATA_DIR = env.str("TRACER_DATA_DIR", default="tracer_data/")
-tracer_fs = FileSystemStorage(location=TRACER_DATA_DIR)
+tracer_fs = FileSystemStorage(location="/data/tracer_data/")
 
 # RT data directory for storing larger files (e.g. snapshots)
-RT_DATA_DIR = env.str("RT_DATA_DIR", default="rt_data/")
-rt_fs = FileSystemStorage(location=RT_DATA_DIR)
+rt_fs = FileSystemStorage(location="/data/rt_data/")
