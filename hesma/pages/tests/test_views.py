@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from hesma.hydro.models import HydroSimulation
 from hesma.pages.models import FAQ, FAQTopic, News
-from hesma.pages.views import faq_view, home_view, mymodel_view
+from hesma.pages.views import contact_view, faq_view, home_view, mymodel_view
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
 from hesma.users.models import User
@@ -122,3 +122,31 @@ class HomeViewTestCase(TestCase):
         self.assertContains(response, "This is test news 4")
         self.assertContains(response, "This is test news 5")
         self.assertNotContains(response, "This is test news 6")
+
+
+class ContactViewTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        from captcha.conf import settings as captcha_settings
+
+        captcha_settings.CAPTCHA_TEST_MODE = True
+
+    def test_contact_view_get(self):
+        request = self.factory.get(reverse("pages:contact"))
+        response = contact_view(request)
+        self.assertEqual(response.status_code, 200)
+
+    def test_contact_view_post(self):
+        request = self.factory.post(
+            reverse("pages:contact"),
+            {
+                "subject": "Test Subject",
+                "email": "from@example.com",
+                "message": "This is a test message",
+                "captcha_0": "TEST",
+                "captcha_1": "PASSED",
+            },
+        )
+        response = contact_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Thank you for contacting us!")

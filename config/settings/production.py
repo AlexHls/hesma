@@ -134,4 +134,3 @@ LOGGING = {
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-CONTACT_EMAILS = env.list("DJANGO_CONTACT_EMAILS", default=["alexander.holas@h-its.org"])

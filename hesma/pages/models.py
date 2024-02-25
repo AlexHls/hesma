@@ -1,5 +1,7 @@
 import datetime
 
+from django.conf import settings
+from django.core.mail import EmailMessage
 from django.db import models
 from django.utils import timezone
 
@@ -46,3 +48,11 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return self.subject
+
+    def create_email_message(self):
+        return EmailMessage(
+            subject=f"Contact message from {self.email}",
+            body=f"Subject: {self.subject}\n\nFrom: {self.email}\n\nMessage: {self.message}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            to=settings.CONTACT_EMAILS,
+        )
