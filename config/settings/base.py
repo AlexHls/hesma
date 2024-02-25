@@ -80,6 +80,7 @@ THIRD_PARTY_APPS = [
     "cookie_consent",
     "bootstrap_modal_forms",
     "widget_tweaks",
+    "captcha",
 ]
 
 LOCAL_APPS = [
@@ -290,6 +291,8 @@ SOCIALACCOUNT_FORMS = {"signup": "hesma.users.forms.UserSocialSignupForm"}
 
 # Your stuff...
 # ------------------------------------------------------------------------------
+# Contact emails where contact form messages are sent to
+CONTACT_EMAILS = env.list("DJANGO_CONTACT_EMAILS", default=["alexander.holas@h-its.org"])
 
 # Chunk size used in streaming responses
 STREAMING_CHUNK_SIZE = env.int("STREAMING_CHUNK_SIZE", default=8192)
