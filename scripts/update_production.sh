@@ -4,8 +4,8 @@ echo "Create database backup? (y/n)"
 read answer
 if [ "$answer" != "${answer#[Yy]}" ] ;then
     echo "Creating database backup..."
-    # Load the environment variables
-    source .envs/.production/.postgres
+    # Load the environment variables, path is specific to the project
+    source $HOME/hesma/.envs/.production/.postgres
 
     # Check if POSTGRES_BACKUP_DIR env var is set
     if [ -z "$POSTGRES_BACKUP_DIR" ]; then
