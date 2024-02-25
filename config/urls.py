@@ -37,6 +37,8 @@ urlpatterns = [
     path("meta/", include("hesma.meta.urls", namespace="meta")),
     # Cookie Consent
     path("cookies/", include("cookie_consent.urls")),
+    # Django Simple Captcha
+    path("captcha/", include("captcha.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

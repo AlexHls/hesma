@@ -80,6 +80,7 @@ THIRD_PARTY_APPS = [
     "cookie_consent",
     "bootstrap_modal_forms",
     "widget_tweaks",
+    "captcha",
 ]
 
 LOCAL_APPS = [
