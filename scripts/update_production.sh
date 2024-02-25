@@ -22,7 +22,7 @@ if [ "$answer" != "${answer#[Yy]}" ] ;then
     fi
 
     # Backup the database
-    docker exec -t hesma_production_postgres pg_dumpall -c -U $POSTGRES_USER | gzip > $backup_dir/dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql.gz
+    docker exec -t hesma-postgres-1 pg_dumpall -c -U $POSTGRES_USER | gzip > $backup_dir/dump_`date +%Y-%m-%d"_"%H_%M_%S`.sql.gz
 
     echo "Backup complete"
 fi
