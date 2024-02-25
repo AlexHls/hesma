@@ -37,6 +37,15 @@
   padding: 1rem;
 }
 
+.landing-contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 5%;
+}
+
 .langing-features {
   display: flex;
   flex-wrap: wrap;

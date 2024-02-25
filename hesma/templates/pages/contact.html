@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="landing-section-content landing-contact">
+    <h1 class="brand">Contact Us</h1>
+    <p class="landing-main-text">
+      If you have any questions, please feel free to contact us.
+      A member of our team will get back to you as soon as possible.
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <table>
+        {{ form.media }}
+        {{ form.as_table }}
+        <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+      </table>
+      <input class="btn btn-primary" type="submit" value="Submit" />
+    </form>
+  </div>
+{% endblock content %}

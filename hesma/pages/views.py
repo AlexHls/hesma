@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from hesma.hydro.models import HydroSimulation
+from hesma.pages.forms import ContactMessageForm
 from hesma.pages.models import FAQ, FAQTopic, News
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
@@ -33,3 +34,17 @@ def mymodel_view(request):
     }
 
     return render(request, "pages/mymodels.html", context)
+
+
+def contact_view(request):
+    if request.method == "POST":
+        form = ContactMessageForm(request.POST)
+        # Check if the form is valid:
+        if form.is_valid():
+            pass
+            # redirect to a new URL:
+            # return HttpResponseRedirect("/thanks/")
+            return render(request, "pages/contact_success.html")
+    else:
+        form = ContactMessageForm()
+    return render(request, "pages/contact.html", {"form": form})

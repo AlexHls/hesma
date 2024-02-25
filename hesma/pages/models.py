@@ -36,3 +36,13 @@ class News(models.Model):
         if self.date > timezone.now():
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
+
+
+class ContactMessage(models.Model):
+    subject = models.CharField(max_length=300)
+    email = models.EmailField()
+    message = models.TextField()
+    date = models.DateField()
+
+    def __str__(self):
+        return self.subject
