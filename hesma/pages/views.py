@@ -1,10 +1,15 @@
+from smtplib import SMTPException
+
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 
 from hesma.hydro.models import HydroSimulation
 from hesma.pages.forms import ContactMessageForm
 from hesma.pages.models import FAQ, FAQTopic, News
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
+from hesma.utils.mailing import send_contact_email
 
 
 def home_view(request):
@@ -41,9 +46,15 @@ def contact_view(request):
         form = ContactMessageForm(request.POST)
         # Check if the form is valid:
         if form.is_valid():
-            pass
-            # redirect to a new URL:
-            # return HttpResponseRedirect("/thanks/")
+            contact = form.save(commit=False)
+            contact.date = timezone.now()
+            try:
+                send_contact_email(contact)
+            except SMTPException:
+                return HttpResponse(status=500, content="Failed to send email. Please try again later")
+            # We only save the contact message if the email was sent successfully
+            contact.save()
+
             return render(request, "pages/contact_success.html")
     else:
         form = ContactMessageForm()
