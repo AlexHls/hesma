@@ -30,4 +30,10 @@
       <a href="{% url 'hydro:hydro_edit' model.id %}" class="btn btn-primary">Edit</a>
     {% endif %}
   </div>
+  {% for model_file in model.hydrosimulation1dmodelfile_set.all %}
+    <div class="detail-section-content">
+      <h2>{{ model_file.name }}</h2>
+      {{ model_file.get_plot_html|safe }}
+    </div>
+  {% endfor %}
 {% endblock content %}

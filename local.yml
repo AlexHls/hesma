@@ -15,6 +15,9 @@ services:
       - postgres
     volumes:
       - .:/app:z
+      - type: bind
+        source: ~/Downloads/hesma_data
+        target: /data
     env_file:
       - ./.envs/.local/.django
       - ./.envs/.local/.postgres
