@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="detail-section-content">
+    <h1 class="brand">{{ file.name }}</h1>
+    <p class="detail-section-text">{{ file.description }}</p>
+    <p class="detail-section-text">
+      This file is part of the <a href="{% url 'hydro:detail' model.id %}" target="_blank">{{ model.name }}</a> model.
+    </p>
+    <a href="{% url 'hydro:hydro_download_hydro1d' model.id file.id %}"
+       target="_blank"
+       class="btn btn-primary">Download model file</a>
+  </div>
+  <div id="hydro1d-model-plot" class="detail-interactive"></div>
+{% endblock content %}
+{% block inline_javascript %}
+  <script>
+    function addPlotlyPlot() {
+      var divId = 'hydro1d-model-plot';
+      var jsonData = {
+        {
+          file.interactive_plot | safe
+        }
+      };
+
+      if (typeof Plotly === 'undefined') {
+        console.error('Plotly library is not loaded.');
+        return;
+      }
+
+      Plotly.newPlot(divId, jsonData.data, jsonData.layout);
+    }
+
+    addPlotlyPlot();
+  </script>
+{% endblock inline_javascript %}

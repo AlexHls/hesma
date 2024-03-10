@@ -3,13 +3,15 @@ import mimetypes
 import os
 import zipfile
 from io import BytesIO, StringIO
+from wsgiref.util import FileWrapper
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
+from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
-from hesma.hydro.models import HydroSimulation
+from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
 
 
 def hydro_landing_view(request):
@@ -118,3 +120,24 @@ def hydro_upload_hydro1d(request, hydrosimulation_id):
     else:
         form = HydroSimulation1DModelFileForm()
     return render(request, "hydro/upload_hydro1d.html", {"form": form})
+
+
+def hydro_hydro1d_interactive_plot(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
+    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    file = model.hydrosimulation1dmodelfile_set.get(id=hydrosimulation1dmodelfile_id)
+    return render(request, "hydro/hydro1d_interactive_plot.html", {"model": model, "file": file})
+
+
+def hydro_download_hydro1d(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
+    file = HydroSimulation1DModelFile.objects.get(id=hydrosimulation1dmodelfile_id)
+    filename = os.path.basename(file.file.path)
+    filepath = file.file.path
+
+    response = StreamingHttpResponse(
+        FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
+        content_type=mimetypes.guess_type(filepath)[0],
+    )
+    response["Content-Length"] = os.path.getsize(filepath)
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+
+    return response

@@ -10,3 +10,11 @@
   padding: 1.5rem;
   background-color: var(--color-gray);
 }
+.detail-section-text {
+  margin: 0.5rem 0.5rem 0.5rem 0.5rem;
+}
+
+.detail-interactive {
+  width: 95%;
+  height: 720px;
+}

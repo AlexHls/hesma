@@ -42,6 +42,13 @@
         <b> Date uploaded: </b>{{ model_file.date }}
       </li>
       <img src="{{ model_file.get_thumbnail_url }}" alt="{{ model_file.name }}" />
+      <br />
+      <a href="{% url 'hydro:hydro_interactive_hydro1d' model.id model_file.id %}"
+         class="btn btn-primary"
+         target="_blank">Interactive plot</a>
+      <a href="{% url 'hydro:hydro_download_hydro1d' model.id model_file.id %}"
+         target="_blank"
+         class="btn btn-primary">Download model file</a>
     </div>
   {% endfor %}
 {% endblock content %}

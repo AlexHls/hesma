@@ -3,9 +3,11 @@ from django.conf.urls.static import static
 from django.urls import path
 
 from hesma.hydro.views import (
+    hydro_download_hydro1d,
     hydro_download_info,
     hydro_download_readme,
     hydro_edit,
+    hydro_hydro1d_interactive_plot,
     hydro_landing_view,
     hydro_model_view,
     hydro_upload_hydro1d,
@@ -32,5 +34,15 @@ urlpatterns = [
         "<int:hydrosimulation_id>/upload_hydro1d",
         view=hydro_upload_hydro1d,
         name="hydro_upload_hydro1d",
+    ),
+    path(
+        "<int:hydrosimulation_id>/<int:hydrosimulation1dmodelfile_id>/interactive_plot",
+        view=hydro_hydro1d_interactive_plot,
+        name="hydro_interactive_hydro1d",
+    ),
+    path(
+        "<int:hydrosimulation_id>/<int:hydrosimulation1dmodelfile_id>/download",
+        view=hydro_download_hydro1d,
+        name="hydro_download_hydro1d",
     ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
