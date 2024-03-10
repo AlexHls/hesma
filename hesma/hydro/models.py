@@ -64,5 +64,8 @@ class HydroSimulation1DModelFile(models.Model):
         return self.thumbnail.url if self.thumbnail else None
 
     def check_if_valid_hesma_file(self):
-        model = hp.load_hydro_1d(self.file.path)
+        try:
+            model = hp.load_hydro_1d(self.file.path)
+        except OSError:
+            return False
         return model.valid
