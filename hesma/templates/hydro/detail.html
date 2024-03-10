@@ -26,14 +26,22 @@
     <a href="{% url 'hydro:hydro_download_info' model.id %}"
        target="_blank"
        class="btn btn-primary">Download</a>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and user == model.user %}
       <a href="{% url 'hydro:hydro_edit' model.id %}" class="btn btn-primary">Edit</a>
+      <a href="{% url 'hydro:hydro_upload_hydro1d' model.id %}"
+         class="btn btn-primary">Upload Hydro1D file</a>
     {% endif %}
   </div>
   {% for model_file in model.hydrosimulation1dmodelfile_set.all %}
-    <div class="detail-section-content">
+    <div class="detail-section-file">
       <h2>{{ model_file.name }}</h2>
-      {{ model_file.get_plot_html|safe }}
+      <li>
+        <b> Description: </b>{{ model_file.description }}
+      </li>
+      <li>
+        <b> Date uploaded: </b>{{ model_file.date }}
+      </li>
+      <img src="{{ model_file.get_thumbnail_url }}" alt="{{ model_file.name }}" />
     </div>
   {% endfor %}
 {% endblock content %}

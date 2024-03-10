@@ -40,6 +40,9 @@ class HydroSimulation1DModelFile(models.Model):
     description = models.TextField(blank=True)
     is_valid_hesma_file = models.BooleanField(default=False)
 
+    thumbnail = models.ImageField(blank=True)
+    interactive_plot = models.JSONField(blank=True, null=True)
+
     def __str__(self):
         return self.name
 
@@ -49,12 +52,10 @@ class HydroSimulation1DModelFile(models.Model):
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
 
-    def get_plot_html(self):
+    def get_plot_json(self):
         model = hp.load_hydro_1d(self.file.path)
         fig = model.plot()
-        return fig.to_html(
-            include_plotlyjs="cdn",
-            full_html=False,
-            default_height=720,
-            default_width=1080,
-        )
+        return fig.to_json()
+
+    def get_thumbnail_url(self):
+        return self.thumbnail.url if self.thumbnail else None

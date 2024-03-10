@@ -32,7 +32,16 @@ class HydroSimulationForm(ModelForm):
 
 
 class HydroSimulation1DModelFileForm(ModelForm):
+    generate_interactive_plot = forms.BooleanField(
+        required=False, label="Generate interactive plot (may take a while)"
+    )
+
     class Meta:
         model = HydroSimulation1DModelFile
         fields = "__all__"
-        exclude = ["date", "is_valid_hesma_file"]
+        exclude = [
+            "date",
+            "is_valid_hesma_file",
+            "interactive_plot",
+            "hydro_simulation",
+        ]

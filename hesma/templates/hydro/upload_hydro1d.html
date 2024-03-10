@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% load auth_extras %}
+{% load widget_tweaks %}
+
+{% block content %}
+  <section class="landing-section landing-main">
+    <div class="landing-section-content">
+      <h1 class="brand">HESMA Hydro1D files</h1>
+      <p class="landing-main-text">
+        Upload your hydrodynamical simulation files to the HESMA database. Please read the FAQ before uploading.
+      </p>
+    </div>
+  </section>
+  <div class="landing-section-content">
+    <h2>Upload Hydro1D file:</h2>
+    <p>
+      Please enter the file details below. Note that the interactive plot will only be generated if the file is in the correct format.
+    </p>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <table>
+        {{ form.media }}
+        {{ form.as_table }}
+        <script type="text/javascript" src="{% url 'admin:jsi18n' %}"></script>
+      </table>
+      <input class="btn btn-primary" type="submit" value="Submit" />
+    </form>
+  </div>
+{% endblock content %}

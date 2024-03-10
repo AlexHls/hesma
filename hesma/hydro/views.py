@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.hydro.forms import HydroSimulationForm
+from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
 from hesma.hydro.models import HydroSimulation
 
 
@@ -101,3 +101,20 @@ def hydro_edit(request, hydrosimulation_id):
         form = HydroSimulationForm(instance=model)
     context = {"form": form, "model": model}
     return render(request, "hydro/edit.html", context)
+
+
+def hydro_upload_hydro1d(request, hydrosimulation_id):
+    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    if request.method == "POST":
+        form = HydroSimulation1DModelFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.date = timezone.now()
+            file.hydro_simulation = model
+            if form.cleaned_data["generate_interactive_plot"]:
+                file.interactive_plot = file.get_plot_json()
+            file.save()
+            return render(request, "hydro/upload_success.html")
+    else:
+        form = HydroSimulation1DModelFileForm()
+    return render(request, "hydro/upload_hydro1d.html", {"form": form})
