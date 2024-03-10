@@ -115,6 +115,7 @@ def hydro_upload_hydro1d(request, hydrosimulation_id):
             file = form.save(commit=False)
             file.date = timezone.now()
             file.hydro_simulation = model
+            file.is_valid_hesma_file = file.check_if_valid_hesma_file()
             if form.cleaned_data["generate_interactive_plot"]:
                 file.interactive_plot = file.get_plot_json()
             file.save()

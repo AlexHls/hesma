@@ -11,7 +11,11 @@
        target="_blank"
        class="btn btn-primary">Download model file</a>
   </div>
-  <div id="hydro1d-model-plot" class="detail-interactive"></div>
+  {% if file.is_valid_hesma_file %}
+    <div id="hydro1d-model-plot" class="detail-interactive"></div>
+  {% else %}
+    <img src="{{ file.get_thumbnail_url }}" alt="{{ file.name }}" />
+  {% endif %}
 {% endblock content %}
 {% block inline_javascript %}
   <script>
@@ -31,6 +35,14 @@
       Plotly.newPlot(divId, jsonData.data, jsonData.layout);
     }
 
+    {
+      %
+      if file.is_valid_hesma_file %
+    }
     addPlotlyPlot();
+    {
+      %
+      endif %
+    }
   </script>
 {% endblock inline_javascript %}

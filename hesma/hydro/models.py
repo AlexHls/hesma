@@ -53,9 +53,16 @@ class HydroSimulation1DModelFile(models.Model):
         return self.date >= timezone.now() - datetime.timedelta(days=14)
 
     def get_plot_json(self):
-        model = hp.load_hydro_1d(self.file.path)
-        fig = model.plot()
-        return fig.to_json()
+        if self.is_valid_hesma_file:
+            model = hp.load_hydro_1d(self.file.path)
+            fig = model.plot()
+            return fig.to_json()
+        else:
+            return None
 
     def get_thumbnail_url(self):
         return self.thumbnail.url if self.thumbnail else None
+
+    def check_if_valid_hesma_file(self):
+        model = hp.load_hydro_1d(self.file.path)
+        return model.valid
