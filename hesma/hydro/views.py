@@ -1,8 +1,7 @@
 import json
 import mimetypes
 import os
-import zipfile
-from io import BytesIO, StringIO
+from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django.http import Http404, HttpResponse, StreamingHttpResponse
@@ -12,6 +11,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
 from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
+from hesma.utils.zip_generator import ZipFileGenerator
 
 
 def hydro_landing_view(request):
@@ -57,9 +57,6 @@ def hydro_download_readme(request, hydrosimulation_id):
 def hydro_download_info(request, hydrosimulation_id):
     obj = HydroSimulation.objects.get(id=hydrosimulation_id)
 
-    zip_filename = "%s.zip" % obj.name
-
-    # Write object data to json file
     json_data = {
         "id": hydrosimulation_id,
         "name": obj.name,
@@ -70,25 +67,17 @@ def hydro_download_info(request, hydrosimulation_id):
     json_file = StringIO()
     json.dump(json_data, json_file)
 
-    # Create zip file
-    s = BytesIO()
-    zf = zipfile.ZipFile(s, "w")
+    hydro1d_files = obj.hydrosimulation1dmodelfile_set.all()
+    selected_files = [file.file.path for file in hydro1d_files]
 
-    # Write files to zip
-    zf.writestr("info.json", bytes(json_file.getvalue(), encoding="utf-8"))
-    if obj.readme:
-        readme_file = obj.readme.path
-        zf.write(readme_file, os.path.basename(readme_file))
+    selected_files.append(obj.readme.path)
 
-    # Must close zip for all contents to be written
-    zf.close()
-
-    # Grab ZIP file from in-memory, make response with correct MIME-type
-    response = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
-    # ..and correct content-disposition
-    response["Content-Disposition"] = "attachment; filename=%s" % zip_filename
-
-    return response
+    zip_generator = ZipFileGenerator(
+        selected_files=selected_files,
+        info_json=json_file,
+        file_name=f"{obj.name}.zip",
+    )
+    return zip_generator.get_response()
 
 
 def hydro_edit(request, hydrosimulation_id):

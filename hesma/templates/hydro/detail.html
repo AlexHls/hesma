@@ -25,6 +25,7 @@
     </ul>
     <a href="{% url 'hydro:hydro_download_info' model.id %}"
        target="_blank"
+       title="Downloads a zip file with the 1D model files, the README and model metadata."
        class="btn btn-primary">Download</a>
     {% if user.is_authenticated and user == model.user %}
       <a href="{% url 'hydro:hydro_edit' model.id %}" class="btn btn-primary">Edit</a>
