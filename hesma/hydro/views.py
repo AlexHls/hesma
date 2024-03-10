@@ -64,13 +64,26 @@ def hydro_download_info(request, hydrosimulation_id):
         "date": obj.date.strftime("%Y-%m-%d %H:%M:%S"),
         "user": obj.user.username,
     }
-    json_file = StringIO()
-    json.dump(json_data, json_file)
 
     hydro1d_files = obj.hydrosimulation1dmodelfile_set.all()
-    selected_files = [file.file.path for file in hydro1d_files]
+    if hydro1d_files:
+        json_data["hydro1d_files"] = [
+            {
+                "id": file.id,
+                "name": file.name,
+                "date": file.date.strftime("%Y-%m-%d %H:%M:%S"),
+                "description": file.description,
+            }
+            for file in hydro1d_files
+        ]
+        selected_files = [file.file.path for file in hydro1d_files]
+    else:
+        selected_files = []
 
     selected_files.append(obj.readme.path)
+
+    json_file = StringIO()
+    json.dump(json_data, json_file)
 
     zip_generator = ZipFileGenerator(
         selected_files=selected_files,
