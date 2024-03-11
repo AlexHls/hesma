@@ -43,3 +43,25 @@ class ZipFileGeneratorTestCase(TestCase):
             zip_file_contents = set(zipf.namelist())
             expected_file_names = {os.path.basename(file_path) for file_path in self.file_paths}
             self.assertEqual(zip_file_contents, expected_file_names)
+
+    def test_response_streaming(self):
+        # Test streaming the zip file as an HTTP response
+        zip_generator = ZipFileGenerator(self.file_paths)
+
+        response = zip_generator.get_response(streaming=True)
+        self.assertTrue(response.streaming_content)
+
+        response = zip_generator.get_response(streaming=False)
+        with self.assertRaises(AttributeError):
+            response.streaming_content
+
+    def test_response_non_streaming(self):
+        # Test non-streaming the zip file as an HTTP response
+        zip_generator = ZipFileGenerator(self.file_paths)
+
+        response = zip_generator.get_response(streaming=False)
+        with self.assertRaises(AttributeError):
+            response.streaming_content
+
+        response = zip_generator.get_response(streaming=True)
+        self.assertTrue(response.streaming_content)

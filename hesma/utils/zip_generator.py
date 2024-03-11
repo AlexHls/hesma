@@ -50,6 +50,7 @@ class ZipFileGenerator:
 
         # Create a StreamingHttpResponse with the zip file content
         if streaming:
+            # Currently unused, important for larger files in the future
             response = StreamingHttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
         else:
             response = HttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
