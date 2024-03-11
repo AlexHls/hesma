@@ -1,3 +1,6 @@
+import zipfile
+from io import BytesIO
+
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import Http404
 from django.test import RequestFactory, TestCase
@@ -125,6 +128,13 @@ class HydroDownloadInfoTestCase(TestCase):
             response.get("Content-Disposition"),
             f"attachment; filename={self.simulation.name}.zip",
         )
+        # This is sort of testing the contents twice. The zip generator test
+        # already tests the contents of the zip file. This is just to make sure
+        # that the response is a valid zip file.
+        with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
+            desired_file = "info.json"
+            file_names_in_zip = zip_file.namelist()
+            self.assertIn(desired_file, file_names_in_zip)
 
 
 class HydroEditTestCase(TestCase):
