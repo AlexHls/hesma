@@ -7,13 +7,16 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from hesma.hydro.models import HydroSimulation
+from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
 from hesma.hydro.views import (
+    hydro_download_hydro1d,
     hydro_download_info,
     hydro_download_readme,
     hydro_edit,
+    hydro_hydro1d_interactive_plot,
     hydro_landing_view,
     hydro_model_view,
+    hydro_upload_hydro1d,
     hydro_upload_view,
 )
 from hesma.users.models import User
@@ -29,6 +32,12 @@ class HydroViewsTestCase(TestCase):
             user=self.user,
             date=timezone.now(),
             readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
+        )
+        self.hydro1d_file = HydroSimulation1DModelFile.objects.create(
+            hydro_simulation=self.simulation,
+            name="Test Hydro1D File",
+            file=SimpleUploadedFile("test_hydro1d_file.json", b"Test hydro1d file contents"),
+            date=timezone.now(),
         )
 
 
@@ -76,7 +85,10 @@ class HydroUploadViewTestCase(TestCase):
             "description": "This is a test simulation",
             "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         }
-        request = self.factory.post(reverse("hydro:hydro_upload"), data=form_data)
+        request = self.factory.post(
+            reverse("hydro:hydro_upload"),
+            data=form_data,
+        )
         request.user = self.user
         response = hydro_upload_view(request)
         self.assertEqual(response.status_code, 200)
@@ -134,8 +146,72 @@ class HydroEditTestCase(HydroViewsTestCase):
             "description": "This is an updated test simulation",
             "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         }
-        request = self.factory.post(reverse("hydro:hydro_edit", args=[self.simulation.id]), data=form_data)
+        request = self.factory.post(
+            reverse("hydro:hydro_edit", args=[self.simulation.id]),
+            data=form_data,
+        )
         request.user = self.user
         response = hydro_edit(request, self.simulation.id)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Simulation Updated")
+
+
+class HydroUploadHydro1DTestCase(HydroViewsTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_hydro_upload_hydro1d_view_get(self):
+        request = self.factory.get(reverse("hydro:hydro_upload_hydro1d", args=[self.simulation.id]))
+        request.user = self.user
+        response = hydro_upload_hydro1d(request, self.simulation.id)
+        self.assertEqual(response.status_code, 200)
+
+    def test_hydro_upload_hydro1d_view_post(self):
+        form_data = {
+            "name": "Test Simulation",
+            "description": "This is a test simulation",
+            "file": SimpleUploadedFile("test_hydro1d_file.json", b"Test hydro1d file contents"),
+        }
+        request = self.factory.post(
+            reverse("hydro:hydro_upload_hydro1d", args=[self.simulation.id]),
+            data=form_data,
+        )
+        request.user = self.user
+        response = hydro_upload_hydro1d(request, self.simulation.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Upload successful")
+
+
+class HydroHydro1DInteractivePlotTestCase(HydroViewsTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_hydro_hydro1d_interactive_plot(self):
+        request = self.factory.get(
+            reverse(
+                "hydro:hydro_interactive_hydro1d",
+                args=[self.simulation.id, self.hydro1d_file.id],
+            )
+        )
+        response = hydro_hydro1d_interactive_plot(request, self.simulation.id, self.hydro1d_file.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Test Simulation")
+
+
+class HydroDownloadHydro1DTestCase(HydroViewsTestCase):
+    def setUp(self):
+        super().setUp()
+
+    def test_hydro_download_hydro1d(self):
+        request = self.factory.get(
+            reverse(
+                "hydro:hydro_download_hydro1d",
+                args=[self.simulation.id, self.hydro1d_file.id],
+            )
+        )
+        response = hydro_download_hydro1d(request, self.simulation.id, self.hydro1d_file.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.get("Content-Disposition"),
+            f"attachment; filename={self.hydro1d_file.file.name}",
+        )
