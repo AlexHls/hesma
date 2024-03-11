@@ -41,6 +41,9 @@ jobs:
       - name: Checkout Code Repository
         uses: actions/checkout@v4
 
+      - name: Make bind mount directory
+        run: mkdir -p /home/runner/Downloads/hesma_data
+
       - name: Build the Stack
         run: docker compose -f local.yml build
 

@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.forms import ModelForm
 
-from hesma.hydro.models import HydroSimulation
+from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
 from hesma.meta.models import DOI, Keyword
 
 
@@ -29,3 +29,19 @@ class HydroSimulationForm(ModelForm):
         label="Keywords",
         required=False,
     )
+
+
+class HydroSimulation1DModelFileForm(ModelForm):
+    generate_interactive_plot = forms.BooleanField(
+        required=False, label="Generate interactive plot (may take a while)"
+    )
+
+    class Meta:
+        model = HydroSimulation1DModelFile
+        fields = "__all__"
+        exclude = [
+            "date",
+            "is_valid_hesma_file",
+            "interactive_plot",
+            "hydro_simulation",
+        ]

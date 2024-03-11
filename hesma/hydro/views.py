@@ -1,15 +1,17 @@
 import json
 import mimetypes
 import os
-import zipfile
-from io import BytesIO, StringIO
+from io import StringIO
+from wsgiref.util import FileWrapper
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.hydro.forms import HydroSimulationForm
-from hesma.hydro.models import HydroSimulation
+from config.settings.base import STREAMING_CHUNK_SIZE
+from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
+from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
+from hesma.utils.zip_generator import ZipFileGenerator
 
 
 def hydro_landing_view(request):
@@ -55,9 +57,6 @@ def hydro_download_readme(request, hydrosimulation_id):
 def hydro_download_info(request, hydrosimulation_id):
     obj = HydroSimulation.objects.get(id=hydrosimulation_id)
 
-    zip_filename = "%s.zip" % obj.name
-
-    # Write object data to json file
     json_data = {
         "id": hydrosimulation_id,
         "name": obj.name,
@@ -65,28 +64,33 @@ def hydro_download_info(request, hydrosimulation_id):
         "date": obj.date.strftime("%Y-%m-%d %H:%M:%S"),
         "user": obj.user.username,
     }
+
+    hydro1d_files = obj.hydrosimulation1dmodelfile_set.all()
+    if hydro1d_files:
+        json_data["hydro1d_files"] = [
+            {
+                "id": file.id,
+                "name": file.name,
+                "date": file.date.strftime("%Y-%m-%d %H:%M:%S"),
+                "description": file.description,
+            }
+            for file in hydro1d_files
+        ]
+        selected_files = [file.file.path for file in hydro1d_files]
+    else:
+        selected_files = []
+
+    selected_files.append(obj.readme.path)
+
     json_file = StringIO()
     json.dump(json_data, json_file)
 
-    # Create zip file
-    s = BytesIO()
-    zf = zipfile.ZipFile(s, "w")
-
-    # Write files to zip
-    zf.writestr("info.json", bytes(json_file.getvalue(), encoding="utf-8"))
-    if obj.readme:
-        readme_file = obj.readme.path
-        zf.write(readme_file, os.path.basename(readme_file))
-
-    # Must close zip for all contents to be written
-    zf.close()
-
-    # Grab ZIP file from in-memory, make response with correct MIME-type
-    response = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
-    # ..and correct content-disposition
-    response["Content-Disposition"] = "attachment; filename=%s" % zip_filename
-
-    return response
+    zip_generator = ZipFileGenerator(
+        selected_files=selected_files,
+        info_json=json_file,
+        file_name=f"{obj.name}.zip",
+    )
+    return zip_generator.get_response()
 
 
 def hydro_edit(request, hydrosimulation_id):
@@ -101,3 +105,42 @@ def hydro_edit(request, hydrosimulation_id):
         form = HydroSimulationForm(instance=model)
     context = {"form": form, "model": model}
     return render(request, "hydro/edit.html", context)
+
+
+def hydro_upload_hydro1d(request, hydrosimulation_id):
+    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    if request.method == "POST":
+        form = HydroSimulation1DModelFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.date = timezone.now()
+            file.hydro_simulation = model
+            file.is_valid_hesma_file = file.check_if_valid_hesma_file()
+            if form.cleaned_data["generate_interactive_plot"]:
+                file.interactive_plot = file.get_plot_json()
+            file.save()
+            return render(request, "hydro/upload_success.html")
+    else:
+        form = HydroSimulation1DModelFileForm()
+    return render(request, "hydro/upload_hydro1d.html", {"form": form})
+
+
+def hydro_hydro1d_interactive_plot(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
+    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    file = model.hydrosimulation1dmodelfile_set.get(id=hydrosimulation1dmodelfile_id)
+    return render(request, "hydro/hydro1d_interactive_plot.html", {"model": model, "file": file})
+
+
+def hydro_download_hydro1d(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
+    file = HydroSimulation1DModelFile.objects.get(id=hydrosimulation1dmodelfile_id)
+    filename = os.path.basename(file.file.path)
+    filepath = file.file.path
+
+    response = StreamingHttpResponse(
+        FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
+        content_type=mimetypes.guess_type(filepath)[0],
+    )
+    response["Content-Length"] = os.path.getsize(filepath)
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+
+    return response

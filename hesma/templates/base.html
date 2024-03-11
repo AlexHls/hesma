@@ -39,6 +39,7 @@
       <link rel="stylesheet"
             type="text/css"
             href="{% static 'css/widgets.css' %}" />
+      <link rel="stylesheet" type="text/css" href="{% static 'css/detail.css' %}" />
       <!-- This file stores project-specific CSS -->
       <link href="{% static 'css/project.css' %}" rel="stylesheet" />
     {% endblock css %}
@@ -66,6 +67,7 @@
       <script src="{% static 'js/bootstrap5.modal.forms.min.js' %}"></script>
       <!----------------->
       <!-- Your stuff: Third-party javascript libraries go here -->
+      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
       <script type="text/javascript"
               src="{% static 'cookie_consent/cookiebar.js' %}"></script>
       {% if request|cookie_consent_enabled %}
