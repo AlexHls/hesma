@@ -19,7 +19,7 @@ from hesma.hydro.views import (
 from hesma.users.models import User
 
 
-class HydroLandingViewTestCase(TestCase):
+class HydroViewsTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
@@ -30,6 +30,11 @@ class HydroLandingViewTestCase(TestCase):
             date=timezone.now(),
             readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         )
+
+
+class HydroLandingViewTestCase(HydroViewsTestCase):
+    def setUp(self):
+        super().setUp()
 
     def test_hydro_landing_view(self):
         request = self.factory.get(reverse("hydro:hydro_landing"))
@@ -38,17 +43,9 @@ class HydroLandingViewTestCase(TestCase):
         self.assertContains(response, "Test Simulation")
 
 
-class HydroModelViewTestCase(TestCase):
+class HydroModelViewTestCase(HydroViewsTestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-        self.simulation = HydroSimulation.objects.create(
-            name="Test Simulation",
-            description="This is a test simulation",
-            user=self.user,
-            date=timezone.now(),
-            readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-        )
+        super().setUp()
 
     def test_hydro_model_view(self):
         request = self.factory.get(reverse("hydro:detail", args=[self.simulation.id]))
@@ -86,17 +83,9 @@ class HydroUploadViewTestCase(TestCase):
         self.assertContains(response, "Upload successful")
 
 
-class HydroDownloadReadmeTestCase(TestCase):
+class HydroDownloadReadmeTestCase(HydroViewsTestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-        self.simulation = HydroSimulation.objects.create(
-            name="Test Simulation",
-            description="This is a test simulation",
-            user=self.user,
-            date=timezone.now(),
-            readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-        )
+        super().setUp()
 
     def test_hydro_download_readme(self):
         request = self.factory.get(reverse("hydro:hydro_download_readme", args=[self.simulation.id]))
@@ -108,17 +97,9 @@ class HydroDownloadReadmeTestCase(TestCase):
         )
 
 
-class HydroDownloadInfoTestCase(TestCase):
+class HydroDownloadInfoTestCase(HydroViewsTestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-        self.simulation = HydroSimulation.objects.create(
-            name="Test Simulation",
-            description="This is a test simulation",
-            user=self.user,
-            date=timezone.now(),
-            readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-        )
+        super().setUp()
 
     def test_hydro_download_info(self):
         request = self.factory.get(reverse("hydro:hydro_download_info", args=[self.simulation.id]))
@@ -137,17 +118,9 @@ class HydroDownloadInfoTestCase(TestCase):
             self.assertIn(desired_file, file_names_in_zip)
 
 
-class HydroEditTestCase(TestCase):
+class HydroEditTestCase(HydroViewsTestCase):
     def setUp(self):
-        self.factory = RequestFactory()
-        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
-        self.simulation = HydroSimulation.objects.create(
-            name="Test Simulation",
-            description="This is a test simulation",
-            user=self.user,
-            date=timezone.now(),
-            readme=SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
-        )
+        super().setUp()
 
     def test_hydro_edit_get(self):
         request = self.factory.get(reverse("hydro:hydro_edit", args=[self.simulation.id]))
