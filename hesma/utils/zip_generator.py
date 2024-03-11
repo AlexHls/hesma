@@ -2,7 +2,7 @@ import os
 import zipfile
 from tempfile import SpooledTemporaryFile
 
-from django.http import StreamingHttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 
 from config.settings.base import STREAMING_CHUNK_SIZE
 
@@ -24,7 +24,13 @@ class ZipFileGenerator:
             if self.info_json:
                 zipf.writestr("info.json", bytes(self.info_json.getvalue(), "utf-8"))
 
-    def get_response(self):
+    def get_response(self, streaming=False):
+        """
+        Create a response with the zip file content
+        :param streaming: If True, create a StreamingHttpResponse. Documentation
+        recommends using StreamingHttpResponse only when absolutely necessary.
+        See https://docs.djangoproject.com/en/5.0/ref/request-response/#streaminghttpresponse-objects
+        """
         # Use a SpooledTemporaryFile as the buffer for the zip file
         buffer = SpooledTemporaryFile()
         self.generate_zip(buffer)
@@ -43,7 +49,10 @@ class ZipFileGenerator:
                 yield data
 
         # Create a StreamingHttpResponse with the zip file content
-        response = StreamingHttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
+        if streaming:
+            response = StreamingHttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
+        else:
+            response = HttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
         response["Content-Length"] = buff_size
         response["Content-Disposition"] = f"attachment; filename={self.file_name}"
         return response
