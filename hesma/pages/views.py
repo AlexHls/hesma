@@ -13,8 +13,13 @@ from hesma.utils.mailing import send_contact_email
 
 
 def home_view(request):
-    news = News.objects.order_by("-date")[:5]
-    return render(request, "pages/home.html", {"news_list": news})
+    news = News.objects.filter(sticky=False).order_by("-date")[:5]
+    sticky_news = News.objects.filter(sticky=True)
+    return render(
+        request,
+        "pages/home.html",
+        {"news_list": news, "sticky_news": sticky_news},
+    )
 
 
 def faq_view(request):
