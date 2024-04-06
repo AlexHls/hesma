@@ -1,8 +1,7 @@
 import json
 import mimetypes
 import os
-import zipfile
-from io import BytesIO, StringIO
+from io import StringIO
 from wsgiref.util import FileWrapper
 
 from django.http import Http404, HttpResponse, StreamingHttpResponse
@@ -12,6 +11,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.rt.forms import RTSimulationForm, RTSimulationLightcurveFileForm, RTSimulationSpectrumFileForm
 from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulationSpectrumFile
+from hesma.utils.zip_generator import ZipFileGenerator
 
 
 def rt_landing_view(request):
@@ -57,8 +57,6 @@ def rt_download_readme(request, rtsimulation_id):
 def rt_download_info(request, rtsimulation_id):
     obj = RTSimulation.objects.get(id=rtsimulation_id)
 
-    zip_filename = "%s.zip" % obj.name
-
     # Write object data to json file
     json_data = {
         "id": rtsimulation_id,
@@ -67,28 +65,44 @@ def rt_download_info(request, rtsimulation_id):
         "date": obj.date.strftime("%Y-%m-%d %H:%M:%S"),
         "user": obj.user.username,
     }
+
+    selected_files = []
+    rt_lightcurve_files = obj.rtsimulationlightcurvefile_set.all()
+    if rt_lightcurve_files:
+        json_data["lightcurve_files"] = [
+            {
+                "id": file.id,
+                "name": file.name,
+                "date": file.date.strftime("%Y-%m-%d %H:%M:%S"),
+                "description": file.description,
+            }
+            for file in rt_lightcurve_files
+        ]
+        selected_files.extend([file.file.path for file in rt_lightcurve_files])
+    rt_spectrum_files = obj.rtsimulationspectrumfile_set.all()
+    if rt_spectrum_files:
+        json_data["spectrum_files"] = [
+            {
+                "id": file.id,
+                "name": file.name,
+                "date": file.date.strftime("%Y-%m-%d %H:%M:%S"),
+                "description": file.description,
+            }
+            for file in rt_spectrum_files
+        ]
+        selected_files.extend([file.file.path for file in rt_spectrum_files])
+
+    selected_files.append(obj.readme.path)
+
     json_file = StringIO()
     json.dump(json_data, json_file)
 
-    # Create zip file
-    s = BytesIO()
-    zf = zipfile.ZipFile(s, "w")
-
-    # Write files to zip
-    zf.writestr("info.json", bytes(json_file.getvalue(), encoding="utf-8"))
-    if obj.readme:
-        readme_file = obj.readme.path
-        zf.write(readme_file, os.path.basename(readme_file))
-
-    # Must close zip for all contents to be written
-    zf.close()
-
-    # Grab ZIP file from in-memory, make response with correct MIME-type
-    response = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
-    # ..and correct content-disposition
-    response["Content-Disposition"] = "attachment; filename=%s" % zip_filename
-
-    return response
+    zip_generator = ZipFileGenerator(
+        selected_files=selected_files,
+        info_json=json_file,
+        file_name=f"{obj.name}.zip",
+    )
+    return zip_generator.get_response()
 
 
 def rt_edit(request, rtsimulation_id):
