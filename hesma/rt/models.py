@@ -1,10 +1,11 @@
 import datetime
 
+import hesmapy.base as hp
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-from config.settings.base import meta_fs
+from config.settings.base import meta_fs, rt_fs
 from hesma.meta.models import DOI, Keyword
 
 
@@ -29,3 +30,81 @@ class RTSimulation(models.Model):
         if self.date > timezone.now():
             return False
         return self.date >= timezone.now() - datetime.timedelta(days=14)
+
+
+class RTSimulationLightcurveFile(models.Model):
+    rt_simulation = models.ForeignKey(RTSimulation, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    file = models.FileField(storage=rt_fs)
+    date = models.DateTimeField("date uploaded")
+    description = models.TextField(blank=True)
+    is_valid_hesma_file = models.BooleanField(default=False)
+
+    thumbnail = models.ImageField(blank=True)
+    interactive_plot = models.JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def was_published_recently(self):
+        # Return False if the date is in the future
+        if self.date > timezone.now():
+            return False
+        return self.date >= timezone.now() - datetime.timedelta(days=14)
+
+    def get_plot_json(self):
+        if self.is_valid_hesma_file:
+            model = hp.load_rt_lightcurve(self.file.path)
+            fig = model.plot()
+            return fig.to_json()
+        else:
+            return None
+
+    def get_thumbnail_url(self):
+        return self.thumbnail.url if self.thumbnail else None
+
+    def check_if_valid_hesma_file(self):
+        try:
+            model = hp.load_rt_lightcurve(self.file.path)
+        except OSError:
+            return False
+        return model.valid
+
+
+class RTSimulationSpectrumFile(models.Model):
+    rt_simulation = models.ForeignKey(RTSimulation, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    file = models.FileField(storage=rt_fs)
+    date = models.DateTimeField("date uploaded")
+    description = models.TextField(blank=True)
+    is_valid_hesma_file = models.BooleanField(default=False)
+
+    thumbnail = models.ImageField(blank=True)
+    interactive_plot = models.JSONField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    def was_published_recently(self):
+        # Return False if the date is in the future
+        if self.date > timezone.now():
+            return False
+        return self.date >= timezone.now() - datetime.timedelta(days=14)
+
+    def get_plot_json(self):
+        if self.is_valid_hesma_file:
+            model = hp.load_rt_spectrum(self.file.path)
+            fig = model.plot()
+            return fig.to_json()
+        else:
+            return None
+
+    def get_thumbnail_url(self):
+        return self.thumbnail.url if self.thumbnail else None
+
+    def check_if_valid_hesma_file(self):
+        try:
+            model = hp.load_rt_spectrum(self.file.path)
+        except OSError:
+            return False
+        return model.valid
