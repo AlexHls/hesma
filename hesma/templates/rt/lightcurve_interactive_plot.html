@@ -12,21 +12,18 @@
        class="btn btn-primary">Download lightcurve file</a>
   </div>
   {% if file.is_valid_hesma_file %}
-    <div id="rt-lightcurve-plot" class="detail-interactive"></div>
+    <div id="rt-lightcurve-plot" class="detail-interactive-lightcurve"></div>
   {% else %}
     <img src="{{ file.get_thumbnail_url }}" alt="{{ file.name }}" />
   {% endif %}
 {% endblock content %}
 {% block inline_javascript %}
   <script>
-    function addPlotlyPlot() {
+    function addLightcurvePlotlyPlot() {
       var divId = 'rt-lightcurve-plot';
-      var jsonData = {
-        {
-          file.interactive_plot | safe
-        }
-      };
-
+      {# djlint:off #}
+      var jsonData = {{ file.interactive_plot | safe }};
+{# djlint:on #}
       if (typeof Plotly === 'undefined') {
         console.error('Plotly library is not loaded.');
         return;
@@ -35,14 +32,10 @@
       Plotly.newPlot(divId, jsonData.data, jsonData.layout);
     }
 
-    {
-      %
-      if file.is_valid_hesma_file %
-    }
-    addPlotlyPlot();
-    {
-      %
-      endif %
-    }
+    {# djlint:off #}
+    {% if file.is_valid_hesma_file %}
+      addLightcurvePlotlyPlot();
+    {% endif %}
+{# djlint:on #}
   </script>
 {% endblock inline_javascript %}

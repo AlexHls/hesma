@@ -141,9 +141,9 @@ def rt_upload_spectrum(request, rtsimulation_id):
     return render(request, "rt/upload_spectrum.html", {"form": form})
 
 
-def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtlightcurvefile_id):
+def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtsimulationlightcurvefile_id):
     model = RTSimulation.objects.get(id=rtsimulation_id)
-    file = model.rtsimulationlightcurvefile_set.get(id=rtlightcurvefile_id)
+    file = model.rtsimulationlightcurvefile_set.get(id=rtsimulationlightcurvefile_id)
     return render(
         request,
         "rt/lightcurve_interactive_plot.html",
@@ -151,9 +151,9 @@ def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtlightcurvefile_id
     )
 
 
-def rt_spectrum_interactive_plot(request, rtsimulation_id, rtspectrumfile_id):
+def rt_spectrum_interactive_plot(request, rtsimulation_id, rtsimulationspectrumfile_id):
     model = RTSimulation.objects.get(id=rtsimulation_id)
-    file = model.rtsimulationspectrumfile_set.get(id=rtspectrumfile_id)
+    file = model.rtsimulationspectrumfile_set.get(id=rtsimulationspectrumfile_id)
     return render(
         request,
         "rt/spectrum_interactive_plot.html",
@@ -161,8 +161,8 @@ def rt_spectrum_interactive_plot(request, rtsimulation_id, rtspectrumfile_id):
     )
 
 
-def rt_download_lightcurve(request, rtsimulation_id, rtlightcurvefile_id):
-    file = RTSimulationLightcurveFile.objects.get(id=rtlightcurvefile_id)
+def rt_download_lightcurve(request, rtsimulation_id, rtsimulationlightcurvefile_id):
+    file = RTSimulationLightcurveFile.objects.get(id=rtsimulationlightcurvefile_id)
     filename = os.path.basename(file.file.path)
     filepath = file.file.path
 
@@ -176,8 +176,8 @@ def rt_download_lightcurve(request, rtsimulation_id, rtlightcurvefile_id):
     return response
 
 
-def rt_download_spectrum(request, rtsimulation_id, rtspectrumfile_id):
-    file = RTSimulationSpectrumFile.objects.get(id=rtspectrumfile_id)
+def rt_download_spectrum(request, rtsimulation_id, rtsimulationspectrumfile_id):
+    file = RTSimulationSpectrumFile.objects.get(id=rtsimulationspectrumfile_id)
     filename = os.path.basename(file.file.path)
     filepath = file.file.path
 

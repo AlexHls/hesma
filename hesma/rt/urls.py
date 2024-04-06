@@ -40,22 +40,22 @@ urlpatterns = [
         name="rt_upload_spectrum",
     ),
     path(
-        "<int:rtsimulation_id>/<int:rtsimulationlightcurvefile_id>/interactive_plot",
+        "<int:rtsimulation_id>/lc/<int:rtsimulationlightcurvefile_id>/interactive_plot",
         view=rt_lightcurve_interactive_plot,
         name="rt_interactive_lightcurve",
     ),
     path(
-        "<int:rtsimulation_id>/<int:rtsimulationspectrumfile_id>/interactive_plot",
+        "<int:rtsimulation_id>/spec/<int:rtsimulationspectrumfile_id>/interactive_plot",
         view=rt_spectrum_interactive_plot,
         name="rt_interactive_spectrum",
     ),
     path(
-        "<int:rtsimulation_id>/<int:rtsimulationlightcurvefile_id>/download",
+        "<int:rtsimulation_id>/lc/<int:rtsimulationlightcurvefile_id>/download",
         view=rt_download_lightcurve,
         name="rt_download_lightcurve",
     ),
     path(
-        "<int:rtsimulation_id>/<int:rtsimulationspectrumfile_id>/download",
+        "<int:rtsimulation_id>/spec/<int:rtsimulationspectrumfile_id>/download",
         view=rt_download_spectrum,
         name="rt_download_spectrum",
     ),

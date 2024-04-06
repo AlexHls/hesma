@@ -19,14 +19,11 @@
 {% endblock content %}
 {% block inline_javascript %}
   <script>
-    function addPlotlyPlot() {
+    function addSpectrumPlotlyPlot() {
       var divId = 'rt-spectrum-plot';
-      var jsonData = {
-        {
-          file.interactive_plot | safe
-        }
-      };
-
+      {# djlint:off #}
+      var jsonData = {{ file.interactive_plot | safe }};
+{# djlint:on #}
       if (typeof Plotly === 'undefined') {
         console.error('Plotly library is not loaded.');
         return;
@@ -35,14 +32,10 @@
       Plotly.newPlot(divId, jsonData.data, jsonData.layout);
     }
 
-    {
-      %
-      if file.is_valid_hesma_file %
-    }
-    addPlotlyPlot();
-    {
-      %
-      endif %
-    }
+    {# djlint:off #}
+    {% if file.is_valid_hesma_file %}
+      addSpectrumPlotlyPlot();
+    {% endif %}
+{# djlint:on #}
   </script>
 {% endblock inline_javascript %}

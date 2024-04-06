@@ -36,12 +36,12 @@ urlpatterns = [
         name="hydro_upload_hydro1d",
     ),
     path(
-        "<int:hydrosimulation_id>/<int:hydrosimulation1dmodelfile_id>/interactive_plot",
+        "<int:hydrosimulation_id>/hydro1d/<int:hydrosimulation1dmodelfile_id>/interactive_plot",
         view=hydro_hydro1d_interactive_plot,
         name="hydro_interactive_hydro1d",
     ),
     path(
-        "<int:hydrosimulation_id>/<int:hydrosimulation1dmodelfile_id>/download",
+        "<int:hydrosimulation_id>/hydro1d/<int:hydrosimulation1dmodelfile_id>/download",
         view=hydro_download_hydro1d,
         name="hydro_download_hydro1d",
     ),
