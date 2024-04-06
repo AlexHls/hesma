@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="detail-section-content">
+    <h1 class="brand">{{ file.name }}</h1>
+    <p class="detail-section-text">{{ file.description }}</p>
+    <p class="detail-section-text">
+      This file is part of the <a href="{% url 'rt:detail' model.id %}" target="_blank">{{ model.name }}</a> model.
+    </p>
+    <a href="{% url 'rt:rt_download_lightcurve' model.id file.id %}"
+       target="_blank"
+       class="btn btn-primary">Download lightcurve file</a>
+  </div>
+  {% if file.is_valid_hesma_file %}
+    <div id="rt-lightcurve-plot" class="detail-interactive"></div>
+  {% else %}
+    <img src="{{ file.get_thumbnail_url }}" alt="{{ file.name }}" />
+  {% endif %}
+{% endblock content %}
+{% block inline_javascript %}
+  <script>
+    function addPlotlyPlot() {
+      var divId = 'rt-lightcurve-plot';
+      var jsonData = {
+        {
+          file.interactive_plot | safe
+        }
+      };
+
+      if (typeof Plotly === 'undefined') {
+        console.error('Plotly library is not loaded.');
+        return;
+      }
+
+      Plotly.newPlot(divId, jsonData.data, jsonData.layout);
+    }
+
+    {
+      %
+      if file.is_valid_hesma_file %
+    }
+    addPlotlyPlot();
+    {
+      %
+      endif %
+    }
+  </script>
+{% endblock inline_javascript %}

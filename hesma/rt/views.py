@@ -146,7 +146,7 @@ def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtlightcurvefile_id
     file = model.rtsimulationlightcurvefile_set.get(id=rtlightcurvefile_id)
     return render(
         request,
-        "rt/interactive_plot.html",
+        "rt/lightcurve_interactive_plot.html",
         {"model": model, "file": file},
     )
 
@@ -156,7 +156,7 @@ def rt_spectrum_interactive_plot(request, rtsimulation_id, rtspectrumfile_id):
     file = model.rtsimulationspectrumfile_set.get(id=rtspectrumfile_id)
     return render(
         request,
-        "rt/interactive_plot.html",
+        "rt/spectrum_interactive_plot.html",
         {"model": model, "file": file},
     )
 
