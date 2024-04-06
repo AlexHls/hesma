@@ -24,9 +24,52 @@
     </ul>
     <a href="{% url 'rt:rt_download_info' model.id %}"
        target="_blank"
+       title="Downloads a zip file with the lightcurve and spectrum files, the README and the model metadata."
        class="btn btn-primary">Download</a>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and user == model.user %}
       <a href="{% url 'rt:rt_edit' model.id %}" class="btn btn-primary">Edit</a>
+      <a href="{% url 'rt:rt_upload_lightcurve' model.id %}"
+         class="btn btn-primary">Upload lightcurve file</a>
+      <a href="{% url 'rt:rt_upload_spectrum' model.id %}"
+         class="btn btn-primary">Upload spectrum file</a>
     {% endif %}
   </div>
+  {% for model_file in model.rtsimulationlightcurvefile_set.all %}
+    <div class="detail-section-file">
+      <h2>{{ model_file.name }}</h2>
+      <li>
+        <b> Description: </b>{{ model_file.description }}
+      </li>
+      <li>
+        <b> Date uploaded: </b>{{ model_file.date }}
+      </li>
+      <img src="{{ model_file.get_thumbnail_url }}" alt="{{ model_file.name }}" />
+      <br />
+      <a href="{% url 'rt:rt_interactive_lightcurve' model.id model_file.id %}"
+         class="btn btn-primary"
+         target="_blank">Interactive plot</a>
+      <a href="{% url 'rt:rt_download_lightcurve' model.id model_file.id %}"
+         target="_blank"
+         class="btn btn-primary">Download lightcurve file</a>
+    </div>
+  {% endfor %}
+  {% for model_file in model.rtsimulationspectrumfile_set.all %}
+    <div class="detail-section-file">
+      <h2>{{ model_file.name }}</h2>
+      <li>
+        <b> Description: </b>{{ model_file.description }}
+      </li>
+      <li>
+        <b> Date uploaded: </b>{{ model_file.date }}
+      </li>
+      <img src="{{ model_file.get_thumbnail_url }}" alt="{{ model_file.name }}" />
+      <br />
+      <a href="{% url 'rt:rt_interactive_spectrum' model.id model_file.id %}"
+         class="btn btn-primary"
+         target="_blank">Interactive plot</a>
+      <a href="{% url 'rt:rt_download_spectrum' model.id model_file.id %}"
+         target="_blank"
+         class="btn btn-primary">Download spectrum file</a>
+    </div>
+  {% endfor %}
 {% endblock content %}

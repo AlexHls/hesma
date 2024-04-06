@@ -48,7 +48,6 @@ class HydroSimulation1DModelFileFormTestCase(TestCase):
         }
         file_data = {"file": SimpleUploadedFile("test_model_file.txt", b"Test model file contents")}
         form = HydroSimulation1DModelFileForm(data=form_data, files=file_data)
-        print(form.errors)
         self.assertTrue(form.is_valid())
 
     def test_hydro_simulation_1d_model_file_form_invalid(self):
