@@ -3,13 +3,15 @@ import mimetypes
 import os
 import zipfile
 from io import BytesIO, StringIO
+from wsgiref.util import FileWrapper
 
-from django.http import Http404, HttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from hesma.rt.forms import RTSimulationForm
-from hesma.rt.models import RTSimulation
+from config.settings.base import STREAMING_CHUNK_SIZE
+from hesma.rt.forms import RTSimulationForm, RTSimulationLightcurveFileForm, RTSimulationSpectrumFileForm
+from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulationSpectrumFile
 
 
 def rt_landing_view(request):
@@ -101,3 +103,89 @@ def rt_edit(request, rtsimulation_id):
         form = RTSimulationForm(instance=model)
     context = {"form": form, "model": model}
     return render(request, "rt/edit.html", context)
+
+
+def rt_upload_lightcurve(request, rtsimulation_id):
+    model = RTSimulation.objects.get(id=rtsimulation_id)
+    if request.method == "POST":
+        form = RTSimulationLightcurveFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.rt_simulation = model
+            file.date = timezone.now()
+            file.is_valid_hesma_file = file.check_if_valid_hesma_file()
+            if form.cleaned_data["generate_interactive_plot"]:
+                file.interactive_plot = file.get_plot_json()
+            file.save()
+            return render(request, "rt/upload_success.html")
+    else:
+        form = RTSimulationLightcurveFileForm()
+    return render(request, "rt/upload_lightcurve.html", {"form": form})
+
+
+def rt_upload_spectrum(request, rtsimulation_id):
+    model = RTSimulation.objects.get(id=rtsimulation_id)
+    if request.method == "POST":
+        form = RTSimulationSpectrumFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = form.save(commit=False)
+            file.rt_simulation = model
+            file.date = timezone.now()
+            file.is_valid_hesma_file = file.check_if_valid_hesma_file()
+            if form.cleaned_data["generate_interactive_plot"]:
+                file.interactive_plot = file.get_plot_json()
+            file.save()
+            return render(request, "rt/upload_success.html")
+    else:
+        form = RTSimulationSpectrumFileForm()
+    return render(request, "rt/upload_spectrum.html", {"form": form})
+
+
+def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtlightcurvefile_id):
+    model = RTSimulation.objects.get(id=rtsimulation_id)
+    file = model.rtsimulationlightcurvefile_set.get(id=rtlightcurvefile_id)
+    return render(
+        request,
+        "rt/interactive_plot.html",
+        {"model": model, "file": file},
+    )
+
+
+def rt_spectrum_interactive_plot(request, rtsimulation_id, rtspectrumfile_id):
+    model = RTSimulation.objects.get(id=rtsimulation_id)
+    file = model.rtsimulationspectrumfile_set.get(id=rtspectrumfile_id)
+    return render(
+        request,
+        "rt/interactive_plot.html",
+        {"model": model, "file": file},
+    )
+
+
+def rt_download_lightcurve(request, rtsimulation_id, rtlightcurvefile_id):
+    file = RTSimulationLightcurveFile.objects.get(id=rtlightcurvefile_id)
+    filename = os.path.basename(file.file.path)
+    filepath = file.file.path
+
+    response = StreamingHttpResponse(
+        FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
+        content_type=mimetypes.guess_type(filepath)[0],
+    )
+    response["Content-Length"] = os.path.getsize(filepath)
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+
+    return response
+
+
+def rt_download_spectrum(request, rtsimulation_id, rtspectrumfile_id):
+    file = RTSimulationSpectrumFile.objects.get(id=rtspectrumfile_id)
+    filename = os.path.basename(file.file.path)
+    filepath = file.file.path
+
+    response = StreamingHttpResponse(
+        FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
+        content_type=mimetypes.guess_type(filepath)[0],
+    )
+    response["Content-Length"] = os.path.getsize(filepath)
+    response["Content-Disposition"] = f"attachment; filename={filename}"
+
+    return response
