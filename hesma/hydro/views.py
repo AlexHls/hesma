@@ -16,7 +16,12 @@ from hesma.utils.zip_generator import ZipFileGenerator
 
 def hydro_landing_view(request):
     latest_model_list = HydroSimulation.objects.order_by("-date")[:5]
-    return render(request, "hydro/landing.html", {"latest_model_list": latest_model_list})
+    model_list = HydroSimulation.objects.all().order_by("name")
+    return render(
+        request,
+        "hydro/landing.html",
+        {"latest_model_list": latest_model_list, "model_list": model_list},
+    )
 
 
 def hydro_model_view(request, hydrosimulation_id):
