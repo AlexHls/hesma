@@ -17,7 +17,7 @@
 }
 
 .landing-section-content {
-  padding: 2rem 0;
+  padding: 2rem 1rem;
   background: var(--color-secondary);
   display: flex;
   align-items: center;
@@ -92,4 +92,27 @@
 .landing-news-text {
   font-size: 1.2rem;
   color: var(--color-black);
+}
+
+.landing-models {
+  margin: 1rem;
+  padding: 1rem;
+  min-height: 60vh;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-model-list {
+  overflow:auto;
+  max-height: 300px;
+  width: 75%;
+  border: 1px solid #ccc;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  box-shadow: 0 0 5px #ccc;
+  align-items: center;
 }
