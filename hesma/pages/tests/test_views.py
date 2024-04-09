@@ -1,3 +1,4 @@
+from django.contrib.auth.models import AnonymousUser
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -68,6 +69,22 @@ class MyModelViewTestCase(TestCase):
         self.assertContains(response, "Test Hydro Model")
         self.assertContains(response, "Test RT Model")
         self.assertContains(response, "Test Tracer Model")
+
+    def test_mymodel_view_not_authenticated(self):
+        request = self.factory.get(reverse("pages:mymodels"))
+        request.user = AnonymousUser()
+        response = mymodel_view(request)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Test Hydro Model")
+        self.assertNotContains(response, "Test RT Model")
+        self.assertNotContains(response, "Test Tracer Model")
+        self.assertContains(response, "You need to be logged in to see your models.")
+
+    def test_mymodel_view_no_user(self):
+        request = self.factory.get(reverse("pages:mymodels"))
+        request.user = None
+        response = mymodel_view(request)
+        self.assertEqual(response.status_code, 403)
 
 
 class HomeViewTestCase(TestCase):
