@@ -32,17 +32,23 @@ def faq_view(request):
 
 
 def mymodel_view(request):
-    # Get all models that are published by the current user
-    hydro_models = HydroSimulation.objects.filter(user=request.user)
-    rt_models = RTSimulation.objects.filter(user=request.user)
-    tracer_models = TracerSimulation.objects.filter(user=request.user)
-
-    context = {
-        "hydro_models": hydro_models,
-        "rt_models": rt_models,
-        "tracer_models": tracer_models,
-    }
-
+    # Check if the user is authenticated
+    if not request.user.is_authenticated:
+        context = {
+            "hydro_models": [],
+            "rt_models": [],
+            "tracer_models": [],
+        }
+    else:
+        # Get all models that are published by the current user
+        hydro_models = HydroSimulation.objects.filter(user=request.user)
+        rt_models = RTSimulation.objects.filter(user=request.user)
+        tracer_models = TracerSimulation.objects.filter(user=request.user)
+        context = {
+            "hydro_models": hydro_models,
+            "rt_models": rt_models,
+            "tracer_models": tracer_models,
+        }
     return render(request, "pages/mymodels.html", context)
 
 
