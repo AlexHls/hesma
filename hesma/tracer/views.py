@@ -14,7 +14,12 @@ from hesma.tracer.models import TracerSimulation
 
 def tracer_landing_view(request):
     latest_model_list = TracerSimulation.objects.order_by("-date")[:5]
-    return render(request, "tracer/landing.html", {"latest_model_list": latest_model_list})
+    model_list = TracerSimulation.objects.all().order_by("name")
+    return render(
+        request,
+        "tracer/landing.html",
+        {"latest_model_list": latest_model_list, "model_list": model_list},
+    )
 
 
 def tracer_model_view(request, tracersimulation_id):
