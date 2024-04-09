@@ -7,18 +7,36 @@
       <p class="landing-main-text">Here your can find various radiative transfer simulations.</p>
     </div>
   </section>
-  <div class="landing-section landing-features">
+  <div class="landing-models">
     <h2>Recent models:</h2>
     {% if latest_model_list %}
-      <ul>
-        {% for model in latest_model_list %}
-          <li>
-            <a href="{% url 'rt:detail' model.id %}" class="landing-link">{{ model.name }}</a>
-          </li>
-        {% endfor %}
-      </ul>
+      <div class="landing-model-list">
+        <ul>
+          {% for model in latest_model_list %}
+            <li>
+              <a href="{% url 'rt:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
     {% else %}
       <p>No recent models are available.</p>
+    {% endif %}
+  </div>
+  <div class="landing-models">
+    <h2>All models:</h2>
+    {% if model_list %}
+      <div class="landing-model-list">
+        <ul>
+          {% for model in model_list %}
+            <li>
+              <a href="{% url 'rt:detail' model.id %}" class="landing-link">{{ model.name }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <p>No models are available.</p>
     {% endif %}
   </div>
 {% endblock content %}

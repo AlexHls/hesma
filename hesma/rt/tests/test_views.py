@@ -53,12 +53,26 @@ class RTSimulationTestCase(TestCase):
 class RTLandingViewTestCase(RTSimulationTestCase):
     def setUp(self):
         super().setUp()
+        # Set up 10 more simulations
+        for i in range(10):
+            RTSimulation.objects.create(
+                name=f"Test Simulation {i}",
+                description=f"This is a test simulation {i}",
+                user=self.user,
+                date=timezone.now(),
+                readme=SimpleUploadedFile(f"test_readme_{i}.txt", f"Test readme file contents {i}".encode()),
+            )
 
     def test_rt_landing_view(self):
         request = self.factory.get(reverse("rt:rt_landing"))
         response = rt_landing_view(request)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Test Simulation")
+        # Check that simulations are first simulation is only displayed once
+        # I.e. in the "All simulations" section
+        self.assertEqual(response.content.decode().count("Test Simulation 0"), 1)
+        # Check that the latest simulations are displayed in the "Latest simulations" section
+        # and the "All simulations" section
+        self.assertEqual(response.content.decode().count("Test Simulation 9"), 2)
 
 
 class RTModelViewTestCase(RTSimulationTestCase):
