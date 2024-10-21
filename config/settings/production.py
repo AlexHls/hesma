@@ -78,6 +78,7 @@ EMAIL_SUBJECT_PREFIX = env(
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = env("DJANGO_EMAIL_HOST", default="localhost")
 EMAIL_PORT = env("DJANGO_EMAIL_PORT", default=25)
+EMAIL_TIMEOUT = env("DJANGO_EMAIL_TIMEOUT", default=30)
 EMAIL_HOST_USER = ""
 EMAIL_HOST_PASSWORD = ""
 EMAIL_USE_TLS = False
