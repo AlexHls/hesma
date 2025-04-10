@@ -14,7 +14,7 @@ django-allauth==0.61.1  # https://github.com/pennersr/django-allauth
 django-crispy-forms==2.3  # https://github.com/django-crispy-forms/django-crispy-forms
 crispy-bootstrap5==2023.10  # https://github.com/django-crispy-forms/crispy-bootstrap5
 django-redis==5.4.0  # https://github.com/jazzband/django-redis
-django-cookie-consent==0.4.0 # https://github.com/jazzband/django-cookie-consent
+django-cookie-consent==0.6.0 # https://github.com/jazzband/django-cookie-consent
 django-bootstrap-modal-forms==3.0.4 # https://github.com/trco/django-bootstrap-modal-forms
 django-widget-tweaks==1.5.0 # https://github.com/jazzband/django-widget-tweaks
 django-simple-captcha==0.6.0 # https://github.com/mbi/django-simple-captcha
