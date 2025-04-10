@@ -33,6 +33,7 @@ http:
         - web-secure
       middlewares:
         - csrf
+        - hsts
       service: django
       tls:
         # https://docs.traefik.io/master/routing/routers/#certresolver
@@ -54,6 +55,13 @@ http:
       # https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
       headers:
         hostsProxyHeaders: ['X-CSRFToken']
+
+    hsts:
+      headers:
+        sslRedirect: true
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
 
   services:
     django:
