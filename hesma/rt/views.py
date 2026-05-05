@@ -4,6 +4,7 @@ import os
 from io import StringIO
 from wsgiref.util import FileWrapper
 
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -11,6 +12,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.rt.forms import RTSimulationForm, RTSimulationLightcurveFileForm, RTSimulationSpectrumFileForm
 from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulationSpectrumFile
+from hesma.utils.permissions import group_required, require_owner
 from hesma.utils.zip_generator import ZipFileGenerator
 
 
@@ -32,6 +34,7 @@ def rt_model_view(request, rtsimulation_id):
     return render(request, "rt/detail.html", {"model": model})
 
 
+@group_required("rt_user")
 def rt_upload_view(request):
     if request.method == "POST":
         form = RTSimulationForm(request.POST, request.FILES)
@@ -110,8 +113,10 @@ def rt_download_info(request, rtsimulation_id):
     return zip_generator.get_response()
 
 
+@login_required
 def rt_edit(request, rtsimulation_id):
     model = RTSimulation.objects.get(id=rtsimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationForm(request.POST, request.FILES, instance=model)
         if form.is_valid():
@@ -124,8 +129,10 @@ def rt_edit(request, rtsimulation_id):
     return render(request, "rt/edit.html", context)
 
 
+@group_required("rt_user")
 def rt_upload_lightcurve(request, rtsimulation_id):
     model = RTSimulation.objects.get(id=rtsimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationLightcurveFileForm(request.POST, request.FILES)
         if form.is_valid():
@@ -142,8 +149,10 @@ def rt_upload_lightcurve(request, rtsimulation_id):
     return render(request, "rt/upload_lightcurve.html", {"form": form})
 
 
+@group_required("rt_user")
 def rt_upload_spectrum(request, rtsimulation_id):
     model = RTSimulation.objects.get(id=rtsimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationSpectrumFileForm(request.POST, request.FILES)
         if form.is_valid():

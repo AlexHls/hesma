@@ -4,12 +4,14 @@ import os
 import zipfile
 from io import BytesIO, StringIO
 
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
 from hesma.tracer.forms import TracerSimulationForm
 from hesma.tracer.models import TracerSimulation
+from hesma.utils.permissions import group_required, require_owner
 
 
 def tracer_landing_view(request):
@@ -30,6 +32,7 @@ def tracer_model_view(request, tracersimulation_id):
     return render(request, "tracer/detail.html", {"model": model})
 
 
+@group_required("tracer_user")
 def tracer_upload_view(request):
     if request.method == "POST":
         form = TracerSimulationForm(request.POST, request.FILES)
@@ -94,8 +97,10 @@ def tracer_download_info(request, tracersimulation_id):
     return response
 
 
+@login_required
 def tracer_edit(request, tracersimulation_id):
     model = TracerSimulation.objects.get(id=tracersimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = TracerSimulationForm(request.POST, request.FILES, instance=model)
         if form.is_valid():

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import AnonymousUser, Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
@@ -10,6 +10,11 @@ from hesma.pages.views import contact_view, faq_view, home_view, mymodel_view
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
 from hesma.users.models import User
+
+
+def add_group(user, group_name):
+    group, _ = Group.objects.get_or_create(name=group_name)
+    user.groups.add(group)
 
 
 class FAQViewTestCase(TestCase):
@@ -85,6 +90,25 @@ class MyModelViewTestCase(TestCase):
         request.user = None
         response = mymodel_view(request)
         self.assertEqual(response.status_code, 403)
+
+
+class UploadSelectorViewTestCase(TestCase):
+    def setUp(self):
+        self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
+
+    def test_upload_selector_handles_missing_groups(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("upload"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Hydro model")
+        self.assertContains(response, "Tracer model")
+        self.assertContains(response, "RT model")
+
+    def test_upload_selector_enables_group_links(self):
+        add_group(self.user, "hydro_user")
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("upload"))
+        self.assertContains(response, reverse("hydro:hydro_upload"))
 
 
 class HomeViewTestCase(TestCase):

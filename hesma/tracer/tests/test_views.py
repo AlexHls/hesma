@@ -1,3 +1,5 @@
+from django.contrib.auth.models import AnonymousUser, Group
+from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import Http404
 from django.test import RequestFactory, TestCase
@@ -14,6 +16,11 @@ from hesma.tracer.views import (
     tracer_upload_view,
 )
 from hesma.users.models import User
+
+
+def add_group(user, group_name):
+    group, _ = Group.objects.get_or_create(name=group_name)
+    user.groups.add(group)
 
 
 class TracerLandingViewTestCase(TestCase):
@@ -77,12 +84,25 @@ class TracerUploadViewTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
+        add_group(self.user, "tracer_user")
 
     def test_tracer_upload_view_get(self):
         request = self.factory.get(reverse("tracer:tracer_upload"))
         request.user = self.user
         response = tracer_upload_view(request)
         self.assertEqual(response.status_code, 200)
+
+    def test_tracer_upload_view_requires_login(self):
+        request = self.factory.get(reverse("tracer:tracer_upload"))
+        request.user = AnonymousUser()
+        response = tracer_upload_view(request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_tracer_upload_view_requires_tracer_group(self):
+        request = self.factory.get(reverse("tracer:tracer_upload"))
+        request.user = User.objects.create(username="nogroup", email="nogroup@test.com")
+        with self.assertRaises(PermissionDenied):
+            tracer_upload_view(request)
 
     def test_tracer_upload_view_post(self):
         form_data = {
@@ -155,8 +175,21 @@ class TracerEditTestCase(TestCase):
 
     def test_tracer_edit_get(self):
         request = self.factory.get(reverse("tracer:tracer_edit", args=[self.simulation.id]))
+        request.user = self.user
         response = tracer_edit(request, self.simulation.id)
         self.assertEqual(response.status_code, 200)
+
+    def test_tracer_edit_requires_login(self):
+        request = self.factory.get(reverse("tracer:tracer_edit", args=[self.simulation.id]))
+        request.user = AnonymousUser()
+        response = tracer_edit(request, self.simulation.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_tracer_edit_requires_owner(self):
+        request = self.factory.get(reverse("tracer:tracer_edit", args=[self.simulation.id]))
+        request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
+        with self.assertRaises(PermissionDenied):
+            tracer_edit(request, self.simulation.id)
 
     def test_tracer_edit_post(self):
         form_data = {
@@ -165,6 +198,7 @@ class TracerEditTestCase(TestCase):
             "readme": SimpleUploadedFile("test_readme.txt", b"Test readme file contents"),
         }
         request = self.factory.post(reverse("tracer:tracer_edit", args=[self.simulation.id]), data=form_data)
+        request.user = self.user
         response = tracer_edit(request, self.simulation.id)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Test Simulation Edited")

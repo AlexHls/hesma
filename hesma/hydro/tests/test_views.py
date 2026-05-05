@@ -1,6 +1,8 @@
 import zipfile
 from io import BytesIO
 
+from django.contrib.auth.models import AnonymousUser, Group
+from django.core.exceptions import PermissionDenied
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.http import Http404
 from django.test import RequestFactory, TestCase
@@ -20,6 +22,11 @@ from hesma.hydro.views import (
     hydro_upload_view,
 )
 from hesma.users.models import User
+
+
+def add_group(user, group_name):
+    group, _ = Group.objects.get_or_create(name=group_name)
+    user.groups.add(group)
 
 
 class HydroViewsTestCase(TestCase):
@@ -86,12 +93,25 @@ class HydroUploadViewTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.user = User.objects.create(username="testuser", email="testuser@test.com", password="testpass")
+        add_group(self.user, "hydro_user")
 
     def test_hydro_upload_view_get(self):
         request = self.factory.get(reverse("hydro:hydro_upload"))
         request.user = self.user
         response = hydro_upload_view(request)
         self.assertEqual(response.status_code, 200)
+
+    def test_hydro_upload_view_requires_login(self):
+        request = self.factory.get(reverse("hydro:hydro_upload"))
+        request.user = AnonymousUser()
+        response = hydro_upload_view(request)
+        self.assertEqual(response.status_code, 302)
+
+    def test_hydro_upload_view_requires_hydro_group(self):
+        request = self.factory.get(reverse("hydro:hydro_upload"))
+        request.user = User.objects.create(username="nogroup", email="nogroup@test.com")
+        with self.assertRaises(PermissionDenied):
+            hydro_upload_view(request)
 
     def test_hydro_upload_view_post(self):
         form_data = {
@@ -154,6 +174,18 @@ class HydroEditTestCase(HydroViewsTestCase):
         response = hydro_edit(request, self.simulation.id)
         self.assertEqual(response.status_code, 200)
 
+    def test_hydro_edit_requires_login(self):
+        request = self.factory.get(reverse("hydro:hydro_edit", args=[self.simulation.id]))
+        request.user = AnonymousUser()
+        response = hydro_edit(request, self.simulation.id)
+        self.assertEqual(response.status_code, 302)
+
+    def test_hydro_edit_requires_owner(self):
+        request = self.factory.get(reverse("hydro:hydro_edit", args=[self.simulation.id]))
+        request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
+        with self.assertRaises(PermissionDenied):
+            hydro_edit(request, self.simulation.id)
+
     def test_hydro_edit_post(self):
         form_data = {
             "name": "Test Simulation Updated",
@@ -173,12 +205,20 @@ class HydroEditTestCase(HydroViewsTestCase):
 class HydroUploadHydro1DTestCase(HydroViewsTestCase):
     def setUp(self):
         super().setUp()
+        add_group(self.user, "hydro_user")
 
     def test_hydro_upload_hydro1d_view_get(self):
         request = self.factory.get(reverse("hydro:hydro_upload_hydro1d", args=[self.simulation.id]))
         request.user = self.user
         response = hydro_upload_hydro1d(request, self.simulation.id)
         self.assertEqual(response.status_code, 200)
+
+    def test_hydro_upload_hydro1d_requires_owner(self):
+        request = self.factory.get(reverse("hydro:hydro_upload_hydro1d", args=[self.simulation.id]))
+        request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
+        add_group(request.user, "hydro_user")
+        with self.assertRaises(PermissionDenied):
+            hydro_upload_hydro1d(request, self.simulation.id)
 
     def test_hydro_upload_hydro1d_view_post(self):
         form_data = {

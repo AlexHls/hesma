@@ -286,45 +286,50 @@ Before production migration:
 
 ## Bugs And Risks Found In Code Review
 
-### Critical: write views are not protected server-side
+### Fixed: write views are now protected server-side
 
-The upload and edit views in `hesma/hydro/views.py`, `hesma/rt/views.py`, and
-`hesma/tracer/views.py` do not use `login_required` or permission checks. They
-set `sim.user = request.user` during upload and accept edits by object ID. This
-means template hiding is doing work that the server should enforce.
+Status: fixed in the first critical-bug implementation pass.
 
-Examples:
+The hydro, RT, and tracer upload/edit views now enforce server-side access
+control:
 
-- `hesma/hydro/views.py:35` `hydro_upload_view`
-- `hesma/hydro/views.py:101` `hydro_edit`
-- `hesma/hydro/views.py:115` `hydro_upload_hydro1d`
-- `hesma/rt/views.py:35` `rt_upload_view`
-- `hesma/rt/views.py:113` `rt_edit`
-- `hesma/rt/views.py:127` `rt_upload_lightcurve`
-- `hesma/rt/views.py:145` `rt_upload_spectrum`
-- `hesma/tracer/views.py:33` `tracer_upload_view`
-- `hesma/tracer/views.py:97` `tracer_edit`
+- Top-level upload views require login and the matching uploader group
+  (`hydro_user`, `rt_user`, or `tracer_user`).
+- Edit views require login and ownership of the edited simulation.
+- Hydro and RT child-file upload views require the matching uploader group and
+  ownership of the parent simulation.
+- DOI and keyword modal create views now require the matching uploader group.
 
-Recommended fix: add authentication, group checks, and owner checks in reusable
-decorators or class-based mixins. Tests should prove unauthorized users receive
-redirects or 403 responses.
+Implementation notes:
 
-### Critical: tracer edit button is visible to all logged-in users
+- Shared helpers live in `hesma/utils/permissions.py`.
+- Focused regression tests were added for unauthenticated users, users without
+  the required group, and non-owner edits/uploads.
+- Docker test pipeline passed after this change.
 
-`hesma/templates/tracer/detail.html:29` shows the tracer edit action to any
-authenticated user, unlike hydro and RT detail pages which check ownership.
+### Fixed: tracer edit button is owner-only
 
-Recommended fix: align tracer behavior with hydro/RT and enforce the same rule
-in the view.
+Status: fixed in the first critical-bug implementation pass.
 
-### High: upload selector can 500 if required groups are missing
+`hesma/templates/tracer/detail.html` now mirrors hydro and RT behavior: only the
+simulation owner sees the edit button. The view also enforces ownership
+server-side.
 
-`hesma/templatetags/auth_extras.py:9` uses `Group.objects.get`, so missing
-groups raise `Group.DoesNotExist` while rendering `hesma/templates/pages/upload.html`.
-The README says these groups must be created manually.
+### Fixed: upload selector no longer 500s when groups are missing
 
-Recommended fix: make `has_group` return `False` if the group does not exist,
-and add a data migration or management command to create required groups.
+Status: fixed in the first critical-bug implementation pass.
+
+Previously, `hesma/templatetags/auth_extras.py` used `Group.objects.get`, so
+missing groups raised `Group.DoesNotExist` while rendering
+`hesma/templates/pages/upload.html`. The README says these groups must be
+created manually.
+
+`has_group` now checks membership through the user's group relation and returns
+`False` when the group is absent. A regression test confirms the upload selector
+renders when no upload groups exist.
+
+Remaining optional hardening: add a data migration or management command to
+create the expected upload groups during setup.
 
 ### High: child-file download routes do not verify parent ownership
 
@@ -479,13 +484,17 @@ README to match the production reality.
 
 ## Test Gaps To Close Before Release
 
-- Unauthorized upload and edit attempts for every archive domain.
-- Group-permission checks for hydro/tracer/RT uploads.
-- Owner-only edit and child-file upload behavior.
+- Unauthorized upload and edit attempts for every archive domain. Initial
+  regression tests added and passing for critical write paths.
+- Group-permission checks for hydro/tracer/RT uploads. Initial regression tests
+  added and passing.
+- Owner-only edit and child-file upload behavior. Initial regression tests added
+  and passing.
 - Missing README behavior.
 - Missing file behavior.
 - Mismatched parent/child download URLs.
-- DOI and keyword modal behavior on edit pages.
+- DOI and keyword modal behavior on edit pages. Upload-page metadata create
+  permissions are covered; edit-page redirect behavior still needs coverage.
 - Contact form behavior with mocked email success and failure.
 - Cookie banner template rendering.
 - Realistic `hesmapy` validation behavior with small fixture files or mocks.
@@ -495,13 +504,15 @@ README to match the production reality.
 
 ### Phase 1: Stabilize Current Production Behavior
 
-- Add server-side auth, group, and owner checks.
-- Fix missing group handling.
-- Fix tracer edit visibility.
+- Add server-side auth, group, and owner checks. Done for hydro, tracer, RT, and
+  metadata create write paths.
+- Fix missing group handling. Done for upload selector rendering.
+- Fix tracer edit visibility. Done.
 - Fix parent/child download lookup.
 - Make README downloads safe.
 - Correct home page typos.
-- Add tests for the above.
+- Add tests for the above. Initial permission tests are done and passing in the
+  Docker pipeline.
 
 This phase should be mostly non-breaking and can be deployed with low migration
 risk.

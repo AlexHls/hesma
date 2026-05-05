@@ -4,6 +4,7 @@ import os
 from io import StringIO
 from wsgiref.util import FileWrapper
 
+from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import render
 from django.utils import timezone
@@ -11,6 +12,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
 from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
+from hesma.utils.permissions import group_required, require_owner
 from hesma.utils.zip_generator import ZipFileGenerator
 
 
@@ -32,6 +34,7 @@ def hydro_model_view(request, hydrosimulation_id):
     return render(request, "hydro/detail.html", {"model": model})
 
 
+@group_required("hydro_user")
 def hydro_upload_view(request):
     if request.method == "POST":
         form = HydroSimulationForm(request.POST, request.FILES)
@@ -98,8 +101,10 @@ def hydro_download_info(request, hydrosimulation_id):
     return zip_generator.get_response()
 
 
+@login_required
 def hydro_edit(request, hydrosimulation_id):
     model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = HydroSimulationForm(request.POST, request.FILES, instance=model)
         if form.is_valid():
@@ -112,8 +117,10 @@ def hydro_edit(request, hydrosimulation_id):
     return render(request, "hydro/edit.html", context)
 
 
+@group_required("hydro_user")
 def hydro_upload_hydro1d(request, hydrosimulation_id):
     model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    require_owner(request, model)
     if request.method == "POST":
         form = HydroSimulation1DModelFileForm(request.POST, request.FILES)
         if form.is_valid():
