@@ -149,6 +149,13 @@ class TracerDownloadReadmeTestCase(TestCase):
         with self.assertRaises(Http404):
             tracer_download_readme(request, simulation.id)
 
+    def test_tracer_download_readme_missing_physical_file(self):
+        readme_name = self.simulation.readme.name
+        self.simulation.readme.storage.delete(readme_name)
+        request = self.factory.get(reverse("tracer:tracer_download_readme", args=[self.simulation.id]))
+        with self.assertRaises(Http404):
+            tracer_download_readme(request, self.simulation.id)
+
 
 class TracerDownloadInfoTestCase(TestCase):
     def setUp(self):

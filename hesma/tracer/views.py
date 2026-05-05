@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from hesma.tracer.forms import TracerSimulationForm
 from hesma.tracer.models import TracerSimulation
+from hesma.utils.downloads import existing_file_path
 from hesma.utils.permissions import group_required, require_owner
 
 
@@ -49,10 +50,8 @@ def tracer_upload_view(request):
 
 def tracer_download_readme(request, tracersimulation_id):
     obj = TracerSimulation.objects.get(id=tracersimulation_id)
-    if not obj.readme:
-        raise Http404("Tracer simulation README does not exist")
-    filename = os.path.basename(obj.readme.path)
-    filepath = obj.readme.path
+    filepath = existing_file_path(obj.readme, "Tracer simulation README does not exist")
+    filename = os.path.basename(filepath)
 
     path = open(filepath)
     mime_type, _ = mimetypes.guess_type(filepath)

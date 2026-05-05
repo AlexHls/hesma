@@ -362,9 +362,20 @@ The models allow blank README files. Previously, download and zip views accessed
 - `hesma/rt/views.py:100`
 - `hesma/tracer/views.py:47`
 
-Direct README downloads now return 404 when no README exists. Hydro, RT, and
-tracer zip downloads skip missing README files while still returning `info.json`.
-Regression tests cover these paths.
+Direct README downloads now return 404 when no README exists or when the
+database points at a file missing from disk. Hydro, RT, and tracer zip downloads
+skip missing README files while still returning `info.json`. Regression tests
+cover these paths.
+
+### Fixed: direct data downloads return 404 when files are missing from disk
+
+Status: fixed in the fourth bug-fix implementation pass.
+
+Hydro 1D, RT lightcurve, and RT spectrum direct download views now validate that
+the referenced physical file exists before opening it. Missing files return 404
+instead of raising filesystem errors. The shared helper lives in
+`hesma/utils/downloads.py`, and regression tests cover all three direct data-file
+download types.
 
 ### Fixed: zip response construction is explicit for non-streaming use
 
@@ -504,7 +515,8 @@ README to match the production reality.
   and passing.
 - Missing README behavior. Initial regression tests added for direct README and
   zip downloads.
-- Missing file behavior.
+- Missing file behavior. Initial regression tests added for direct README,
+  hydro 1D, RT lightcurve, and RT spectrum downloads.
 - Mismatched parent/child download URLs. Regression tests added for hydro 1D, RT
   lightcurve, and RT spectrum downloads.
 - DOI and keyword modal behavior on edit pages. Upload-page metadata create

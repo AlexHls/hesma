@@ -159,6 +159,13 @@ class RTDownloadReadmeTestCase(RTSimulationTestCase):
         with self.assertRaises(Http404):
             rt_download_readme(request, simulation.id)
 
+    def test_rt_download_readme_missing_physical_file(self):
+        readme_name = self.simulation.readme.name
+        self.simulation.readme.storage.delete(readme_name)
+        request = self.factory.get(reverse("rt:rt_download_readme", args=[self.simulation.id]))
+        with self.assertRaises(Http404):
+            rt_download_readme(request, self.simulation.id)
+
 
 class RTDownloadInfoTestCase(RTSimulationTestCase):
     def setUp(self):
@@ -360,6 +367,18 @@ class RTDownloadLightcurveTestCase(RTSimulationTestCase):
         with self.assertRaises(Http404):
             rt_download_lightcurve(request, other_simulation.id, self.lightcurve_file.id)
 
+    def test_rt_download_lightcurve_missing_physical_file(self):
+        file_name = self.lightcurve_file.file.name
+        self.lightcurve_file.file.storage.delete(file_name)
+        request = self.factory.get(
+            reverse(
+                "rt:rt_download_lightcurve",
+                args=[self.simulation.id, self.lightcurve_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            rt_download_lightcurve(request, self.simulation.id, self.lightcurve_file.id)
+
 
 class RTDownloadSpectrumTestCase(RTSimulationTestCase):
     def setUp(self):
@@ -394,3 +413,15 @@ class RTDownloadSpectrumTestCase(RTSimulationTestCase):
         )
         with self.assertRaises(Http404):
             rt_download_spectrum(request, other_simulation.id, self.spectrum_file.id)
+
+    def test_rt_download_spectrum_missing_physical_file(self):
+        file_name = self.spectrum_file.file.name
+        self.spectrum_file.file.storage.delete(file_name)
+        request = self.factory.get(
+            reverse(
+                "rt:rt_download_spectrum",
+                args=[self.simulation.id, self.spectrum_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            rt_download_spectrum(request, self.simulation.id, self.spectrum_file.id)

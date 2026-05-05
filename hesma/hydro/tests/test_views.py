@@ -153,6 +153,13 @@ class HydroDownloadReadmeTestCase(HydroViewsTestCase):
         with self.assertRaises(Http404):
             hydro_download_readme(request, simulation.id)
 
+    def test_hydro_download_readme_missing_physical_file(self):
+        readme_name = self.simulation.readme.name
+        self.simulation.readme.storage.delete(readme_name)
+        request = self.factory.get(reverse("hydro:hydro_download_readme", args=[self.simulation.id]))
+        with self.assertRaises(Http404):
+            hydro_download_readme(request, self.simulation.id)
+
 
 class HydroDownloadInfoTestCase(HydroViewsTestCase):
     def setUp(self):
@@ -309,3 +316,15 @@ class HydroDownloadHydro1DTestCase(HydroViewsTestCase):
         )
         with self.assertRaises(Http404):
             hydro_download_hydro1d(request, other_simulation.id, self.hydro1d_file.id)
+
+    def test_hydro_download_hydro1d_missing_physical_file(self):
+        file_name = self.hydro1d_file.file.name
+        self.hydro1d_file.file.storage.delete(file_name)
+        request = self.factory.get(
+            reverse(
+                "hydro:hydro_download_hydro1d",
+                args=[self.simulation.id, self.hydro1d_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            hydro_download_hydro1d(request, self.simulation.id, self.hydro1d_file.id)

@@ -12,6 +12,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.hydro.forms import HydroSimulation1DModelFileForm, HydroSimulationForm
 from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
+from hesma.utils.downloads import existing_file_path
 from hesma.utils.permissions import group_required, require_owner
 from hesma.utils.zip_generator import ZipFileGenerator
 
@@ -51,10 +52,8 @@ def hydro_upload_view(request):
 
 def hydro_download_readme(request, hydrosimulation_id):
     obj = HydroSimulation.objects.get(id=hydrosimulation_id)
-    if not obj.readme:
-        raise Http404("Hydro simulation README does not exist")
-    filename = os.path.basename(obj.readme.path)
-    filepath = obj.readme.path
+    filepath = existing_file_path(obj.readme, "Hydro simulation README does not exist")
+    filename = os.path.basename(filepath)
 
     path = open(filepath)
     mime_type, _ = mimetypes.guess_type(filepath)
@@ -152,8 +151,8 @@ def hydro_download_hydro1d(request, hydrosimulation_id, hydrosimulation1dmodelfi
         id=hydrosimulation1dmodelfile_id,
         hydro_simulation_id=hydrosimulation_id,
     )
-    filename = os.path.basename(file.file.path)
-    filepath = file.file.path
+    filepath = existing_file_path(file.file, "Hydro 1D model file does not exist")
+    filename = os.path.basename(filepath)
 
     response = StreamingHttpResponse(
         FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),

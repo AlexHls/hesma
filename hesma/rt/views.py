@@ -12,6 +12,7 @@ from django.utils import timezone
 from config.settings.base import STREAMING_CHUNK_SIZE
 from hesma.rt.forms import RTSimulationForm, RTSimulationLightcurveFileForm, RTSimulationSpectrumFileForm
 from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulationSpectrumFile
+from hesma.utils.downloads import existing_file_path
 from hesma.utils.permissions import group_required, require_owner
 from hesma.utils.zip_generator import ZipFileGenerator
 
@@ -51,10 +52,8 @@ def rt_upload_view(request):
 
 def rt_download_readme(request, rtsimulation_id):
     obj = RTSimulation.objects.get(id=rtsimulation_id)
-    if not obj.readme:
-        raise Http404("RT simulation README does not exist")
-    filename = os.path.basename(obj.readme.path)
-    filepath = obj.readme.path
+    filepath = existing_file_path(obj.readme, "RT simulation README does not exist")
+    filename = os.path.basename(filepath)
 
     path = open(filepath)
     mime_type, _ = mimetypes.guess_type(filepath)
@@ -198,8 +197,8 @@ def rt_download_lightcurve(request, rtsimulation_id, rtsimulationlightcurvefile_
         id=rtsimulationlightcurvefile_id,
         rt_simulation_id=rtsimulation_id,
     )
-    filename = os.path.basename(file.file.path)
-    filepath = file.file.path
+    filepath = existing_file_path(file.file, "RT lightcurve file does not exist")
+    filename = os.path.basename(filepath)
 
     response = StreamingHttpResponse(
         FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
@@ -217,8 +216,8 @@ def rt_download_spectrum(request, rtsimulation_id, rtsimulationspectrumfile_id):
         id=rtsimulationspectrumfile_id,
         rt_simulation_id=rtsimulation_id,
     )
-    filename = os.path.basename(file.file.path)
-    filepath = file.file.path
+    filepath = existing_file_path(file.file, "RT spectrum file does not exist")
+    filename = os.path.basename(filepath)
 
     response = StreamingHttpResponse(
         FileWrapper(open(filepath, "rb"), STREAMING_CHUNK_SIZE),
