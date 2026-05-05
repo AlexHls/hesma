@@ -524,7 +524,8 @@ README to match the production reality.
 - DOI and keyword modal behavior on edit pages. Upload-page metadata create
   permissions and edit-page success URLs are covered; full modal integration
   testing in-browser is still useful.
-- Contact form behavior with mocked email success and failure.
+- Contact form behavior with mocked email success and failure. Regression tests
+  now cover successful email send/save and failed email/no-save behavior.
 - Cookie banner template rendering. Source-level regression coverage was added
   for the malformed template delimiter bug; browser-level behavior should still
   be smoke-tested before release.

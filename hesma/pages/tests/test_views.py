@@ -1,3 +1,6 @@
+from smtplib import SMTPException
+from unittest.mock import patch
+
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -6,7 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from hesma.hydro.models import HydroSimulation
-from hesma.pages.models import FAQ, FAQTopic, News
+from hesma.pages.models import FAQ, ContactMessage, FAQTopic, News
 from hesma.pages.views import contact_view, faq_view, home_view, mymodel_view
 from hesma.rt.models import RTSimulation
 from hesma.tracer.models import TracerSimulation
@@ -180,22 +183,33 @@ class ContactViewTestCase(TestCase):
 
         captcha_settings.CAPTCHA_TEST_MODE = True
 
+    def valid_post_data(self):
+        return {
+            "subject": "Test Subject",
+            "email": "from@example.com",
+            "message": "This is a test message",
+            "captcha_0": "TEST",
+            "captcha_1": "PASSED",
+        }
+
     def test_contact_view_get(self):
         request = self.factory.get(reverse("pages:contact"))
         response = contact_view(request)
         self.assertEqual(response.status_code, 200)
 
     def test_contact_view_post(self):
-        request = self.factory.post(
-            reverse("pages:contact"),
-            {
-                "subject": "Test Subject",
-                "email": "from@example.com",
-                "message": "This is a test message",
-                "captcha_0": "TEST",
-                "captcha_1": "PASSED",
-            },
-        )
-        response = contact_view(request)
+        request = self.factory.post(reverse("pages:contact"), self.valid_post_data())
+        with patch("hesma.pages.views.send_contact_email") as send_contact_email:
+            response = contact_view(request)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Thank you for contacting us!")
+        send_contact_email.assert_called_once()
+        self.assertEqual(ContactMessage.objects.count(), 1)
+
+    def test_contact_view_post_does_not_save_if_email_fails(self):
+        request = self.factory.post(reverse("pages:contact"), self.valid_post_data())
+        with patch("hesma.pages.views.send_contact_email", side_effect=SMTPException):
+            response = contact_view(request)
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, "Failed to send email", status_code=500)
+        self.assertEqual(ContactMessage.objects.count(), 0)
