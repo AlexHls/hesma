@@ -448,8 +448,10 @@ helpers. The base template now loads one ordered Bootstrap 5 path: jQuery,
 Popper, Bootstrap 5, and one Bootstrap 5 modal helper. A source-level regression
 test checks that the removed duplicate scripts do not return.
 
-Remaining improvement: load Plotly only on interactive plot pages instead of on
-every page.
+Plotly has also been moved out of the base template and into the three
+interactive plot templates that require it. A source-level regression test checks
+that `plotly-latest.min.js` is absent from the base template and present on the
+hydro 1D, RT lightcurve, and RT spectrum plot templates.
 
 ### Fixed: cookie-consent inline template no longer contains malformed tags
 
@@ -520,6 +522,7 @@ README to match the production reality.
   characters.
 - Close files consistently or use Django `FileResponse`.
 - Move Plotly loading out of the base template and into interactive plot pages.
+  Done for hydro 1D, RT lightcurve, and RT spectrum plot pages.
 - Add lint/test coverage for templates to catch malformed template tags.
 
 ## Test Gaps To Close Before Release

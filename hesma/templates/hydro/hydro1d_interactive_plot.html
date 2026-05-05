@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 
+{% block javascript %}
+  {{ block.super }}
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+{% endblock javascript %}
+
 {% block content %}
   <div class="detail-section-content">
     <h1 class="brand">{{ file.name }}</h1>

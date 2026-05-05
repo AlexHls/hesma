@@ -129,6 +129,18 @@ class BaseTemplateTestCase(TestCase):
         self.assertEqual(template.count("bootstrap.min.js"), 1)
         self.assertEqual(template.count("bootstrap5.modal.forms.js"), 1)
 
+    def test_plotly_only_loads_on_interactive_plot_templates(self):
+        base_template = (settings.APPS_DIR / "templates" / "base.html").read_text()
+        self.assertNotIn("plotly-latest.min.js", base_template)
+
+        plot_templates = [
+            settings.APPS_DIR / "templates" / "hydro" / "hydro1d_interactive_plot.html",
+            settings.APPS_DIR / "templates" / "rt" / "lightcurve_interactive_plot.html",
+            settings.APPS_DIR / "templates" / "rt" / "spectrum_interactive_plot.html",
+        ]
+        for template_path in plot_templates:
+            self.assertIn("plotly-latest.min.js", template_path.read_text())
+
 
 class HomeViewTestCase(TestCase):
     def setUp(self):
