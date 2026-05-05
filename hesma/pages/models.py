@@ -36,9 +36,10 @@ class News(models.Model):
 
     def was_published_recently(self):
         # Return False if the date is in the future
-        if self.date > timezone.now():
+        today = timezone.localdate()
+        if self.date > today:
             return False
-        return self.date >= timezone.now() - datetime.timedelta(days=14)
+        return self.date >= today - datetime.timedelta(days=14)
 
 
 class ContactMessage(models.Model):

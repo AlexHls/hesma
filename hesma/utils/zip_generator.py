@@ -53,7 +53,7 @@ class ZipFileGenerator:
             # Currently unused, important for larger files in the future
             response = StreamingHttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
         else:
-            response = HttpResponse(file_iterator(buffer), content_type="application/x-zip-compressed")
+            response = HttpResponse(buffer.read(), content_type="application/x-zip-compressed")
         response["Content-Length"] = buff_size
         response["Content-Disposition"] = f"attachment; filename={self.file_name}"
         return response

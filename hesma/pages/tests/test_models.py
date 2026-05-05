@@ -46,7 +46,7 @@ class NewsModelTestCase(TestCase):
         self.news = News.objects.create(
             title="Test News",
             content="This is a test news",
-            date=timezone.now(),
+            date=timezone.localdate(),
         )
 
     def test_news_str(self):
@@ -56,12 +56,16 @@ class NewsModelTestCase(TestCase):
         self.assertTrue(self.news.was_published_recently())
 
     def test_news_was_published_recently_future(self):
-        self.news.date = timezone.now() + datetime.timedelta(days=1)
+        self.news.date = timezone.localdate() + datetime.timedelta(days=1)
         self.assertFalse(self.news.was_published_recently())
 
     def test_news_was_published_recently_old(self):
-        self.news.date = timezone.now() - datetime.timedelta(days=15)
+        self.news.date = timezone.localdate() - datetime.timedelta(days=15)
         self.assertFalse(self.news.was_published_recently())
+
+    def test_news_was_published_recently_today_date(self):
+        self.news.date = timezone.localdate()
+        self.assertTrue(self.news.was_published_recently())
 
 
 class ContactMessageModelTestCase(TestCase):

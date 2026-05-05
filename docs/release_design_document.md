@@ -366,15 +366,18 @@ Direct README downloads now return 404 when no README exists. Hydro, RT, and
 tracer zip downloads skip missing README files while still returning `info.json`.
 Regression tests cover these paths.
 
-### High: zip response construction is likely incorrect for non-streaming use
+### Fixed: zip response construction is explicit for non-streaming use
 
-`hesma/utils/zip_generator.py:56` passes a generator to `HttpResponse`. Django
-may consume this into content, but this pattern is unclear and can be fragile
-for large files. Tracer zip creation uses an in-memory `BytesIO` instead,
-creating inconsistent behavior.
+Status: fixed in the third bug-fix implementation pass.
 
-Recommended fix: use `FileResponse` or `StreamingHttpResponse` consistently for
-large archives, and use a shared zip utility for tracer, hydro, and RT.
+Previously, `hesma/utils/zip_generator.py` passed a generator to `HttpResponse`
+for non-streaming responses. Non-streaming responses now read concrete bytes
+from the zip buffer, while the streaming path remains available. Regression
+tests verify that the non-streaming response body is valid zip content and that
+`Content-Length` matches the response body length.
+
+Remaining improvement: use one shared zip utility for tracer, hydro, and RT so
+archive generation behavior is fully consistent.
 
 ### High: expensive validation and plot generation happen during uploads
 
@@ -405,12 +408,13 @@ Recommended fix: avoid disruptive inheritance migrations for now. First extract
 shared view/helper functions and tests. Consider abstract base models later only
 if the schema impact is worth it.
 
-### Medium: `News.was_published_recently` compares `DateField` to datetime
+### Fixed: `News.was_published_recently` compares dates consistently
 
-`hesma/pages/models.py:39` compares a `date` value to `timezone.now()`, a
-datetime. This can raise or behave incorrectly depending on execution path.
+Status: fixed in the third bug-fix implementation pass.
 
-Recommended fix: compare against `timezone.localdate()`.
+`hesma/pages/models.py` now compares `News.date` against
+`timezone.localdate()`, avoiding date/datetime comparison problems. Regression
+tests use date values for today, future news, and old news.
 
 ### Medium: base template includes duplicate and mixed Bootstrap assets
 
@@ -453,15 +457,15 @@ Recommended fix: defer a field rename until there is a migration plan. In the
 short term, encapsulate DOI display in helpers/templates and document the current
 field name.
 
-### Medium: metadata create views have invalid edit success URLs
+### Fixed: metadata edit create views no longer reverse ID-less edit URLs
 
-Several metadata modal create views use `reverse_lazy("hydro:hydro_edit")`,
-`reverse_lazy("rt:rt_edit")`, or `reverse_lazy("tracer:tracer_edit")` without the
-required object ID. These paths likely fail or cannot redirect correctly from an
-edit modal.
+Status: fixed in the third bug-fix implementation pass.
 
-Recommended fix: include the current object ID in modal URLs or redirect back to
-the request path.
+The DOI and keyword modal create views for edit pages no longer use
+`reverse_lazy("hydro:hydro_edit")`, `reverse_lazy("rt:rt_edit")`, or
+`reverse_lazy("tracer:tracer_edit")` without object IDs. They now return to the
+HTTP referer, with upload-page fallbacks. Regression tests cover DOI and keyword
+edit success URLs for hydro, RT, and tracer.
 
 ### Low: README storage documentation does not match current settings
 
@@ -504,7 +508,8 @@ README to match the production reality.
 - Mismatched parent/child download URLs. Regression tests added for hydro 1D, RT
   lightcurve, and RT spectrum downloads.
 - DOI and keyword modal behavior on edit pages. Upload-page metadata create
-  permissions are covered; edit-page redirect behavior still needs coverage.
+  permissions and edit-page success URLs are covered; full modal integration
+  testing in-browser is still useful.
 - Contact form behavior with mocked email success and failure.
 - Cookie banner template rendering.
 - Realistic `hesmapy` validation behavior with small fixture files or mocks.

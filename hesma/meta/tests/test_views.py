@@ -6,11 +6,17 @@ from django.urls import reverse_lazy
 from hesma.meta.forms import DOIForm, KeywordForm
 from hesma.meta.views import (
     DOICreateViewHydro,
+    DOICreateViewHydroEdit,
     DOICreateViewRT,
+    DOICreateViewRTEdit,
     DOICreateViewTracer,
+    DOICreateViewTracerEdit,
     KeywordCreateViewHydro,
+    KeywordCreateViewHydroEdit,
     KeywordCreateViewRT,
+    KeywordCreateViewRTEdit,
     KeywordCreateViewTracer,
+    KeywordCreateViewTracerEdit,
 )
 from hesma.users.models import User
 
@@ -20,7 +26,6 @@ def add_group(user, group_name):
     user.groups.add(group)
 
 
-# The test cases for the DOI Edit views are missing. TODO
 class DOICreateViewHydroUploadTestCase(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -58,6 +63,38 @@ class DOICreateViewHydroUploadTestCase(TestCase):
         request.user = User.objects.create_user(username="nogroup", email="nogroup@test.com")
         with self.assertRaises(PermissionDenied):
             DOICreateViewHydro.as_view()(request)
+
+
+class MetadataEditSuccessUrlTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.user = User.objects.create_user(username="testuser", email="testuser@test.com", password="testpass")
+
+    def _assert_referer_success_url(self, view_class, group_name):
+        add_group(self.user, group_name)
+        request = self.factory.get("/meta/create/", HTTP_REFERER="/return/here/")
+        request.user = self.user
+        view = view_class()
+        view.setup(request)
+        self.assertEqual(view.get_success_url(), "/return/here/")
+
+    def test_hydro_edit_doi_success_url_uses_referer(self):
+        self._assert_referer_success_url(DOICreateViewHydroEdit, "hydro_user")
+
+    def test_rt_edit_doi_success_url_uses_referer(self):
+        self._assert_referer_success_url(DOICreateViewRTEdit, "rt_user")
+
+    def test_tracer_edit_doi_success_url_uses_referer(self):
+        self._assert_referer_success_url(DOICreateViewTracerEdit, "tracer_user")
+
+    def test_hydro_edit_keyword_success_url_uses_referer(self):
+        self._assert_referer_success_url(KeywordCreateViewHydroEdit, "hydro_user")
+
+    def test_rt_edit_keyword_success_url_uses_referer(self):
+        self._assert_referer_success_url(KeywordCreateViewRTEdit, "rt_user")
+
+    def test_tracer_edit_keyword_success_url_uses_referer(self):
+        self._assert_referer_success_url(KeywordCreateViewTracerEdit, "tracer_user")
 
 
 class DOICreateViewRTUploadTestCase(TestCase):

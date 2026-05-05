@@ -5,6 +5,13 @@ from hesma.meta.forms import DOIForm, KeywordForm
 from hesma.utils.permissions import GroupRequiredMixin
 
 
+class RefererSuccessUrlMixin:
+    fallback_success_url = "/"
+
+    def get_success_url(self):
+        return self.request.META.get("HTTP_REFERER", self.fallback_success_url)
+
+
 class DOICreateViewHydro(GroupRequiredMixin, BSModalCreateView):
     group_name = "hydro_user"
     template_name = "meta/create_doi.html"
@@ -13,12 +20,12 @@ class DOICreateViewHydro(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("hydro:hydro_upload")
 
 
-class DOICreateViewHydroEdit(GroupRequiredMixin, BSModalCreateView):
+class DOICreateViewHydroEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "hydro_user"
+    fallback_success_url = reverse_lazy("hydro:hydro_upload")
     template_name = "meta/create_doi.html"
     form_class = DOIForm
     success_message = "Success: DOI was created."
-    success_url = reverse_lazy("hydro:hydro_edit")
 
 
 class DOICreateViewRT(GroupRequiredMixin, BSModalCreateView):
@@ -29,12 +36,12 @@ class DOICreateViewRT(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("rt:rt_upload")
 
 
-class DOICreateViewRTEdit(GroupRequiredMixin, BSModalCreateView):
+class DOICreateViewRTEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "rt_user"
+    fallback_success_url = reverse_lazy("rt:rt_upload")
     template_name = "meta/create_doi.html"
     form_class = DOIForm
     success_message = "Success: DOI was created."
-    success_url = reverse_lazy("rt:rt_edit")
 
 
 class DOICreateViewTracer(GroupRequiredMixin, BSModalCreateView):
@@ -45,12 +52,12 @@ class DOICreateViewTracer(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("tracer:tracer_upload")
 
 
-class DOICreateViewTracerEdit(GroupRequiredMixin, BSModalCreateView):
+class DOICreateViewTracerEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "tracer_user"
+    fallback_success_url = reverse_lazy("tracer:tracer_upload")
     template_name = "meta/create_doi.html"
     form_class = DOIForm
     success_message = "Success: DOI was created."
-    success_url = reverse_lazy("tracer:tracer_edit")
 
 
 class KeywordCreateViewHydro(GroupRequiredMixin, BSModalCreateView):
@@ -61,12 +68,12 @@ class KeywordCreateViewHydro(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("hydro:hydro_upload")
 
 
-class KeywordCreateViewHydroEdit(GroupRequiredMixin, BSModalCreateView):
+class KeywordCreateViewHydroEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "hydro_user"
+    fallback_success_url = reverse_lazy("hydro:hydro_upload")
     template_name = "meta/create_keyword.html"
     form_class = KeywordForm
     success_message = "Success: Keyword was created."
-    success_url = reverse_lazy("hydro:hydro_edit")
 
 
 class KeywordCreateViewRT(GroupRequiredMixin, BSModalCreateView):
@@ -77,12 +84,12 @@ class KeywordCreateViewRT(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("rt:rt_upload")
 
 
-class KeywordCreateViewRTEdit(GroupRequiredMixin, BSModalCreateView):
+class KeywordCreateViewRTEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "rt_user"
+    fallback_success_url = reverse_lazy("rt:rt_upload")
     template_name = "meta/create_keyword.html"
     form_class = KeywordForm
     success_message = "Success: Keyword was created."
-    success_url = reverse_lazy("rt:rt_edit")
 
 
 class KeywordCreateViewTracer(GroupRequiredMixin, BSModalCreateView):
@@ -93,9 +100,9 @@ class KeywordCreateViewTracer(GroupRequiredMixin, BSModalCreateView):
     success_url = reverse_lazy("tracer:tracer_upload")
 
 
-class KeywordCreateViewTracerEdit(GroupRequiredMixin, BSModalCreateView):
+class KeywordCreateViewTracerEdit(RefererSuccessUrlMixin, GroupRequiredMixin, BSModalCreateView):
     group_name = "tracer_user"
+    fallback_success_url = reverse_lazy("tracer:tracer_upload")
     template_name = "meta/create_keyword.html"
     form_class = KeywordForm
     success_message = "Success: Keyword was created."
-    success_url = reverse_lazy("tracer:tracer_edit")

@@ -1,6 +1,7 @@
 import os
 import tempfile
 import zipfile
+from io import BytesIO
 
 from django.test import TestCase
 
@@ -65,3 +66,14 @@ class ZipFileGeneratorTestCase(TestCase):
 
         response = zip_generator.get_response(streaming=True)
         self.assertTrue(response.streaming_content)
+
+    def test_non_streaming_response_contains_zip_bytes(self):
+        zip_generator = ZipFileGenerator(self.file_paths)
+
+        response = zip_generator.get_response(streaming=False)
+
+        self.assertEqual(response["Content-Length"], str(len(response.content)))
+        with zipfile.ZipFile(BytesIO(response.content), "r") as zipf:
+            zip_file_contents = set(zipf.namelist())
+            expected_file_names = {os.path.basename(file_path) for file_path in self.file_paths}
+            self.assertEqual(zip_file_contents, expected_file_names)
