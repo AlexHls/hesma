@@ -71,6 +71,13 @@ on the filesystem under mounted storage directories:
 - Tracer simulations currently contain top-level metadata and README handling,
   but no concrete tracer data-file model exists in this codebase.
 
+The current split into hydro, tracer, and RT simulations is historical. It is
+useful as a user-facing classification, but it is not necessarily the right
+long-term data model. A single physical supernova model or simulation campaign
+may have hydrodynamic snapshots, tracer-particle outputs, radiative-transfer
+calculations, derived 1D profiles, plots, and publication metadata attached to
+the same underlying model.
+
 ### Downloads
 
 - Per-model zip downloads for hydro and RT include metadata JSON, README, and
@@ -114,10 +121,86 @@ Release quality should mean:
 - Archive metadata is searchable and filterable enough for scientific use.
 - Dataset pages clearly expose citation, DOI, keywords, file contents, and
   data-format status.
+- Users can discover models through queryable scientific metadata, not only
+  through archive category pages.
+- Hydro, tracer, and RT data can be linked when they belong to the same
+  simulation, progenitor, explosion model, or publication.
 - Production deployment, backup, restore, and migration steps are documented and
   rehearsed.
 - Tests cover critical permissions, downloads, upload flows, and data migration
   behavior.
+
+## Long-Term Archive Model
+
+The key product concept should be a searchable collection of supernova models.
+Hydro, tracer, and RT should be supported for all relevant simulations, but they
+should become data-product types attached to a model rather than isolated top
+level worlds.
+
+A possible future structure:
+
+- `Simulation` or `Model`: the canonical scientific object users search for and
+  cite. It stores shared metadata such as name, aliases, description, authors,
+  publications, DOI, keywords, progenitor information, explosion type, dimension,
+  code, date, license, visibility, and owner.
+- `DataProduct`: a typed attachment to a simulation. Product types include
+  hydro snapshot, hydro 1D profile, tracer particles, RT lightcurve, RT
+  spectrum, abundance table, initial conditions, derived plot, README, and
+  miscellaneous supplementary file.
+- `DataFile`: storage details for large raw files, including path, size,
+  checksum, MIME type, format, compression, validation state, and provenance.
+- `ProfileData` or `TabularData`: normalized database storage for small 1D
+  profiles or simple tabular products, avoiding unnecessary file handling when
+  the data is small enough to query and visualize directly.
+- `MetadataValue` or explicit scientific metadata fields: structured values
+  that support filtering by model type, progenitor mass, isotope set, time,
+  wavelength range, viewing angle, dimensionality, code, metallicity, energy,
+  ejecta mass, nickel mass, and similar domain-specific quantities.
+
+This structure would allow one simulation page to show all associated hydro,
+tracer, and RT products together. It would also allow cross-cutting search such
+as "all Type Ia models with tracer data and RT spectra", "all 1D profiles for a
+given publication", or "all models with a progenitor mass range and downloadable
+lightcurves".
+
+### Migration Strategy Toward A Unified Model
+
+Because HESMA is already in production, this should be staged carefully:
+
+- Keep existing hydro, tracer, and RT URLs working.
+- Add a new canonical simulation/model layer without deleting the existing
+  tables.
+- Link existing `HydroSimulation`, `TracerSimulation`, and `RTSimulation`
+  records to the new canonical object through nullable foreign keys.
+- Backfill canonical records from existing production data.
+- Make new search and detail pages read from the canonical layer while old
+  detail pages redirect or present compatibility views.
+- Only consider merging or removing historical tables after the new model has
+  been used safely in production.
+
+For the first release, a less disruptive alternative is to add a
+`simulation_group` or `related_simulations` relation that links hydro, tracer,
+and RT records belonging to the same physical model. This provides user-visible
+value without requiring a major schema rewrite.
+
+### Flexible Data Storage
+
+The current implementation is geared toward 1D profiles and `hesmapy`
+visualization. This is useful for quick plots, but the archive should support
+multiple data scales:
+
+- Large raw files: keep in mounted filesystem storage and track metadata in the
+  database.
+- Medium derived products: keep as files when they are naturally file-based, but
+  store checksums, formats, and validation status.
+- Small 1D profiles or tables: store directly in the database as structured
+  arrays or rows when this improves querying, previewing, and plotting.
+- Derived visualization data: cache generated Plotly JSON or thumbnails, but
+  make it reproducible from the stored source product.
+
+This does not require abandoning `hesmapy`. It should become one validator and
+reader among several, used for supported formats while the database model stays
+format-agnostic enough to grow.
 
 ## Planned And Recommended Features
 
@@ -129,9 +212,13 @@ Release quality should mean:
   visibility.
 - Add a real tracer data-file model and upload/download flow, or explicitly
   scope tracer to metadata-only for the first release.
-- Add public search and filters across name, author, keyword, DOI, archive type,
-  and date.
+- Add public search and filters across name, aliases, author, keyword, DOI,
+  publication, archive/product type, date, and scientific metadata.
+- Add a way to link hydro, tracer, and RT records that belong to the same
+  physical simulation.
 - Show DOI and keyword metadata on detail pages.
+- Show attached data products on each model page, including whether hydro,
+  tracer, and RT products exist.
 - Make README optional paths safe everywhere, or make README required through a
   migration and data cleanup.
 - Add dataset-level and file-level validation state to the UI.
@@ -146,6 +233,12 @@ Release quality should mean:
 - Add structured metadata export endpoints, for example JSON metadata without
   downloading all files.
 - Add per-file size, checksum, MIME type, original filename, and format version.
+- Add structured scientific metadata fields for query filters. Initial fields
+  should be chosen with domain users, but likely include simulation dimension,
+  model class, progenitor/ejecta properties, code, data-product type,
+  publication, and availability of hydro/tracer/RT outputs.
+- Add direct database storage for small 1D profile or tabular products, with an
+  export path that preserves the current file-download expectation.
 - Generate thumbnails and Plotly JSON asynchronously.
 - Add admin dashboards for invalid files, missing files, missing README files,
   and orphaned data.
@@ -159,11 +252,13 @@ Release quality should mean:
 ### Later Enhancements
 
 - Public API for model discovery and metadata.
+- Unified canonical simulation/model pages that aggregate hydro, tracer, RT, and
+  derived products.
 - Bulk upload workflow for larger datasets.
 - Download manifest and checksum verification.
 - Dataset versioning and change history.
-- Cross-links between hydro, tracer, and RT products from the same simulation
-  campaign.
+- Cross-links and dependency/provenance chains between hydro, tracer, and RT
+  products from the same simulation campaign.
 - DOI enrichment from Crossref/DataCite/arXiv where possible.
 - Background job queue for validation, thumbnails, plot JSON, and large zip
   preparation.
@@ -415,6 +510,10 @@ risk.
 
 - Display DOI and keyword metadata on detail pages.
 - Add search, filters, and pagination.
+- Add first-pass scientific metadata filters that work across hydro, tracer, and
+  RT simulations.
+- Add explicit related-simulation links so hydro, tracer, and RT records from the
+  same model can be discovered together.
 - Add validation state display.
 - Add file size/checksum metadata.
 - Add better metadata JSON export.
@@ -424,6 +523,10 @@ This phase may include additive migrations.
 
 ### Phase 3: Improve Upload And Processing Architecture
 
+- Introduce a canonical model/simulation layer or a transitional grouping layer
+  for hydro, tracer, and RT products.
+- Add data-product abstractions for hydro snapshots, tracer data, RT lightcurves,
+  RT spectra, and small directly stored profiles.
 - Introduce background processing for validation, plot JSON, and thumbnails.
 - Add upload review/moderation if public contributions are expected.
 - Add operational dashboards for invalid/missing files.
@@ -436,6 +539,8 @@ This phase may require a queue service and larger operational changes.
 - Add API endpoints or documented JSON exports.
 - Add dataset versioning or change history.
 - Add bulk upload and manifest workflow.
+- Add richer provenance views showing how RT calculations or tracer outputs
+  relate to hydro simulations.
 - Add monitoring, metrics, and release runbooks.
 - Run production-like restore and deployment rehearsal.
 
@@ -443,6 +548,13 @@ This phase may require a queue service and larger operational changes.
 
 - Should tracer data remain metadata-only for the first release, or should it get
   concrete tracer file models now?
+- Should HESMA introduce a new canonical `Simulation`/`Model` table, or should
+  the first release use a lighter relation that links existing hydro, tracer,
+  and RT records?
+- Which metadata should be required, optional, and free-form for search? This
+  should be decided with scientific users before adding strict constraints.
+- Which 1D profile/table data is small and regular enough to store directly in
+  PostgreSQL, and which data should always remain file-backed?
 - Should uploads be private/reviewed until approved, or immediately public?
 - Is user self-registration desired for release, or should accounts be
   administrator-created?
