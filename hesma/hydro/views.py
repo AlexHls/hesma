@@ -51,7 +51,7 @@ def hydro_upload_view(request):
 
 
 def hydro_download_readme(request, hydrosimulation_id):
-    obj = HydroSimulation.objects.get(id=hydrosimulation_id)
+    obj = get_object_or_404(HydroSimulation, id=hydrosimulation_id)
     filepath = existing_file_path(obj.readme, "Hydro simulation README does not exist")
     filename = os.path.basename(filepath)
 
@@ -64,7 +64,7 @@ def hydro_download_readme(request, hydrosimulation_id):
 
 
 def hydro_download_info(request, hydrosimulation_id):
-    obj = HydroSimulation.objects.get(id=hydrosimulation_id)
+    obj = get_object_or_404(HydroSimulation, id=hydrosimulation_id)
 
     json_data = {
         "id": hydrosimulation_id,
@@ -105,7 +105,7 @@ def hydro_download_info(request, hydrosimulation_id):
 
 @login_required
 def hydro_edit(request, hydrosimulation_id):
-    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    model = get_object_or_404(HydroSimulation, id=hydrosimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = HydroSimulationForm(request.POST, request.FILES, instance=model)
@@ -121,7 +121,7 @@ def hydro_edit(request, hydrosimulation_id):
 
 @group_required("hydro_user")
 def hydro_upload_hydro1d(request, hydrosimulation_id):
-    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    model = get_object_or_404(HydroSimulation, id=hydrosimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = HydroSimulation1DModelFileForm(request.POST, request.FILES)
@@ -140,7 +140,7 @@ def hydro_upload_hydro1d(request, hydrosimulation_id):
 
 
 def hydro_hydro1d_interactive_plot(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
-    model = HydroSimulation.objects.get(id=hydrosimulation_id)
+    model = get_object_or_404(HydroSimulation, id=hydrosimulation_id)
     file = model.hydrosimulation1dmodelfile_set.get(id=hydrosimulation1dmodelfile_id)
     return render(request, "hydro/hydro1d_interactive_plot.html", {"model": model, "file": file})
 

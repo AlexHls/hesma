@@ -6,7 +6,7 @@ from io import BytesIO, StringIO
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from hesma.tracer.forms import TracerSimulationForm
@@ -49,7 +49,7 @@ def tracer_upload_view(request):
 
 
 def tracer_download_readme(request, tracersimulation_id):
-    obj = TracerSimulation.objects.get(id=tracersimulation_id)
+    obj = get_object_or_404(TracerSimulation, id=tracersimulation_id)
     filepath = existing_file_path(obj.readme, "Tracer simulation README does not exist")
     filename = os.path.basename(filepath)
 
@@ -62,7 +62,7 @@ def tracer_download_readme(request, tracersimulation_id):
 
 
 def tracer_download_info(request, tracersimulation_id):
-    obj = TracerSimulation.objects.get(id=tracersimulation_id)
+    obj = get_object_or_404(TracerSimulation, id=tracersimulation_id)
 
     zip_filename = "%s.zip" % obj.name
 
@@ -100,7 +100,7 @@ def tracer_download_info(request, tracersimulation_id):
 
 @login_required
 def tracer_edit(request, tracersimulation_id):
-    model = TracerSimulation.objects.get(id=tracersimulation_id)
+    model = get_object_or_404(TracerSimulation, id=tracersimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = TracerSimulationForm(request.POST, request.FILES, instance=model)

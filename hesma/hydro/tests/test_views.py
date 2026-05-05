@@ -153,6 +153,11 @@ class HydroDownloadReadmeTestCase(HydroViewsTestCase):
         with self.assertRaises(Http404):
             hydro_download_readme(request, simulation.id)
 
+    def test_hydro_download_readme_invalid_id(self):
+        request = self.factory.get(reverse("hydro:hydro_download_readme", args=[100]))
+        with self.assertRaises(Http404):
+            hydro_download_readme(request, 100)
+
     def test_hydro_download_readme_missing_physical_file(self):
         readme_name = self.simulation.readme.name
         self.simulation.readme.storage.delete(readme_name)
@@ -194,6 +199,11 @@ class HydroDownloadInfoTestCase(HydroViewsTestCase):
         with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
             self.assertIn("info.json", zip_file.namelist())
 
+    def test_hydro_download_info_invalid_id(self):
+        request = self.factory.get(reverse("hydro:hydro_download_info", args=[100]))
+        with self.assertRaises(Http404):
+            hydro_download_info(request, 100)
+
 
 class HydroEditTestCase(HydroViewsTestCase):
     def setUp(self):
@@ -216,6 +226,12 @@ class HydroEditTestCase(HydroViewsTestCase):
         request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
         with self.assertRaises(PermissionDenied):
             hydro_edit(request, self.simulation.id)
+
+    def test_hydro_edit_invalid_id(self):
+        request = self.factory.get(reverse("hydro:hydro_edit", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            hydro_edit(request, 100)
 
     def test_hydro_edit_post(self):
         form_data = {
@@ -250,6 +266,12 @@ class HydroUploadHydro1DTestCase(HydroViewsTestCase):
         add_group(request.user, "hydro_user")
         with self.assertRaises(PermissionDenied):
             hydro_upload_hydro1d(request, self.simulation.id)
+
+    def test_hydro_upload_hydro1d_invalid_parent_id(self):
+        request = self.factory.get(reverse("hydro:hydro_upload_hydro1d", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            hydro_upload_hydro1d(request, 100)
 
     def test_hydro_upload_hydro1d_view_post(self):
         form_data = {

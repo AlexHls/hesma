@@ -159,6 +159,11 @@ class RTDownloadReadmeTestCase(RTSimulationTestCase):
         with self.assertRaises(Http404):
             rt_download_readme(request, simulation.id)
 
+    def test_rt_download_readme_invalid_id(self):
+        request = self.factory.get(reverse("rt:rt_download_readme", args=[100]))
+        with self.assertRaises(Http404):
+            rt_download_readme(request, 100)
+
     def test_rt_download_readme_missing_physical_file(self):
         readme_name = self.simulation.readme.name
         self.simulation.readme.storage.delete(readme_name)
@@ -200,6 +205,11 @@ class RTDownloadInfoTestCase(RTSimulationTestCase):
         with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
             self.assertIn("info.json", zip_file.namelist())
 
+    def test_rt_download_info_invalid_id(self):
+        request = self.factory.get(reverse("rt:rt_download_info", args=[100]))
+        with self.assertRaises(Http404):
+            rt_download_info(request, 100)
+
 
 class RTEditTestCase(RTSimulationTestCase):
     def setUp(self):
@@ -222,6 +232,12 @@ class RTEditTestCase(RTSimulationTestCase):
         request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
         with self.assertRaises(PermissionDenied):
             rt_edit(request, self.simulation.id)
+
+    def test_rt_edit_invalid_id(self):
+        request = self.factory.get(reverse("rt:rt_edit", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            rt_edit(request, 100)
 
     def test_rt_edit_post(self):
         form_data = {
@@ -253,6 +269,12 @@ class RTUploadLightcurveTestCase(RTSimulationTestCase):
         add_group(request.user, "rt_user")
         with self.assertRaises(PermissionDenied):
             rt_upload_lightcurve(request, self.simulation.id)
+
+    def test_rt_upload_lightcurve_invalid_parent_id(self):
+        request = self.factory.get(reverse("rt:rt_upload_lightcurve", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            rt_upload_lightcurve(request, 100)
 
     def test_rt_upload_lightcurve_post(self):
         form_data = {
@@ -287,6 +309,12 @@ class RTUploadSpectrumTestCase(RTSimulationTestCase):
         add_group(request.user, "rt_user")
         with self.assertRaises(PermissionDenied):
             rt_upload_spectrum(request, self.simulation.id)
+
+    def test_rt_upload_spectrum_invalid_parent_id(self):
+        request = self.factory.get(reverse("rt:rt_upload_spectrum", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            rt_upload_spectrum(request, 100)
 
     def test_rt_upload_spectrum_post(self):
         form_data = {

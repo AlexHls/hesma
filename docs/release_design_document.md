@@ -377,6 +377,16 @@ instead of raising filesystem errors. The shared helper lives in
 `hesma/utils/downloads.py`, and regression tests cover all three direct data-file
 download types.
 
+### Fixed: missing objects return 404 in download and edit paths
+
+Status: fixed in the sixth bug-fix implementation pass.
+
+Several download, edit, child-upload, and interactive-plot paths used raw
+`.get()` calls after URL dispatch. Missing simulation IDs could raise model
+`DoesNotExist` exceptions instead of returning normal 404 responses. These paths
+now use `get_object_or_404`, with regression tests covering invalid IDs for
+hydro, RT, and tracer download/edit flows.
+
 ### Fixed: zip response construction is explicit for non-streaming use
 
 Status: fixed in the third bug-fix implementation pass.
@@ -495,7 +505,8 @@ README to match the production reality.
   loading simulations, building zip metadata, downloading files, checking
   ownership, and handling upload success.
 - Use `get_object_or_404` instead of manual `try`/`except` or raw `.get()` where
-  missing objects should become 404s.
+  missing objects should become 404s. Initial pass done for high-traffic
+  download/edit paths.
 - Use `select_related("user")` and `prefetch_related("keywords", "DOI")` on
   listing/detail views once metadata is displayed.
 - Add indexes for common search/filter fields after search requirements are

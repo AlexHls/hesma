@@ -51,7 +51,7 @@ def rt_upload_view(request):
 
 
 def rt_download_readme(request, rtsimulation_id):
-    obj = RTSimulation.objects.get(id=rtsimulation_id)
+    obj = get_object_or_404(RTSimulation, id=rtsimulation_id)
     filepath = existing_file_path(obj.readme, "RT simulation README does not exist")
     filename = os.path.basename(filepath)
 
@@ -64,7 +64,7 @@ def rt_download_readme(request, rtsimulation_id):
 
 
 def rt_download_info(request, rtsimulation_id):
-    obj = RTSimulation.objects.get(id=rtsimulation_id)
+    obj = get_object_or_404(RTSimulation, id=rtsimulation_id)
 
     # Write object data to json file
     json_data = {
@@ -117,7 +117,7 @@ def rt_download_info(request, rtsimulation_id):
 
 @login_required
 def rt_edit(request, rtsimulation_id):
-    model = RTSimulation.objects.get(id=rtsimulation_id)
+    model = get_object_or_404(RTSimulation, id=rtsimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationForm(request.POST, request.FILES, instance=model)
@@ -133,7 +133,7 @@ def rt_edit(request, rtsimulation_id):
 
 @group_required("rt_user")
 def rt_upload_lightcurve(request, rtsimulation_id):
-    model = RTSimulation.objects.get(id=rtsimulation_id)
+    model = get_object_or_404(RTSimulation, id=rtsimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationLightcurveFileForm(request.POST, request.FILES)
@@ -153,7 +153,7 @@ def rt_upload_lightcurve(request, rtsimulation_id):
 
 @group_required("rt_user")
 def rt_upload_spectrum(request, rtsimulation_id):
-    model = RTSimulation.objects.get(id=rtsimulation_id)
+    model = get_object_or_404(RTSimulation, id=rtsimulation_id)
     require_owner(request, model)
     if request.method == "POST":
         form = RTSimulationSpectrumFileForm(request.POST, request.FILES)
@@ -172,7 +172,7 @@ def rt_upload_spectrum(request, rtsimulation_id):
 
 
 def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtsimulationlightcurvefile_id):
-    model = RTSimulation.objects.get(id=rtsimulation_id)
+    model = get_object_or_404(RTSimulation, id=rtsimulation_id)
     file = model.rtsimulationlightcurvefile_set.get(id=rtsimulationlightcurvefile_id)
     return render(
         request,
@@ -182,7 +182,7 @@ def rt_lightcurve_interactive_plot(request, rtsimulation_id, rtsimulationlightcu
 
 
 def rt_spectrum_interactive_plot(request, rtsimulation_id, rtsimulationspectrumfile_id):
-    model = RTSimulation.objects.get(id=rtsimulation_id)
+    model = get_object_or_404(RTSimulation, id=rtsimulation_id)
     file = model.rtsimulationspectrumfile_set.get(id=rtsimulationspectrumfile_id)
     return render(
         request,

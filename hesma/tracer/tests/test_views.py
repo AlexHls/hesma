@@ -149,6 +149,11 @@ class TracerDownloadReadmeTestCase(TestCase):
         with self.assertRaises(Http404):
             tracer_download_readme(request, simulation.id)
 
+    def test_tracer_download_readme_invalid_id(self):
+        request = self.factory.get(reverse("tracer:tracer_download_readme", args=[100]))
+        with self.assertRaises(Http404):
+            tracer_download_readme(request, 100)
+
     def test_tracer_download_readme_missing_physical_file(self):
         readme_name = self.simulation.readme.name
         self.simulation.readme.storage.delete(readme_name)
@@ -189,6 +194,11 @@ class TracerDownloadInfoTestCase(TestCase):
         response = tracer_download_info(request, simulation.id)
         self.assertEqual(response.status_code, 200)
 
+    def test_tracer_download_info_invalid_id(self):
+        request = self.factory.get(reverse("tracer:tracer_download_info", args=[100]))
+        with self.assertRaises(Http404):
+            tracer_download_info(request, 100)
+
 
 class TracerEditTestCase(TestCase):
     def setUp(self):
@@ -219,6 +229,12 @@ class TracerEditTestCase(TestCase):
         request.user = User.objects.create(username="otheruser", email="otheruser@test.com")
         with self.assertRaises(PermissionDenied):
             tracer_edit(request, self.simulation.id)
+
+    def test_tracer_edit_invalid_id(self):
+        request = self.factory.get(reverse("tracer:tracer_edit", args=[100]))
+        request.user = self.user
+        with self.assertRaises(Http404):
+            tracer_edit(request, 100)
 
     def test_tracer_edit_post(self):
         form_data = {
