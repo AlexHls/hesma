@@ -49,6 +49,8 @@ def tracer_upload_view(request):
 
 def tracer_download_readme(request, tracersimulation_id):
     obj = TracerSimulation.objects.get(id=tracersimulation_id)
+    if not obj.readme:
+        raise Http404("Tracer simulation README does not exist")
     filename = os.path.basename(obj.readme.path)
     filepath = obj.readme.path
 

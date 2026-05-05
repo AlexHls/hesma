@@ -331,23 +331,29 @@ renders when no upload groups exist.
 Remaining optional hardening: add a data migration or management command to
 create the expected upload groups during setup.
 
-### High: child-file download routes do not verify parent ownership
+### Fixed: child-file download routes now verify parent relation
 
-Hydro and RT file download views fetch the file object by file ID only:
+Status: fixed in the second critical-bug implementation pass.
+
+Previously, hydro and RT file download views fetched the file object by file ID
+only:
 
 - `hesma/hydro/views.py:139`
 - `hesma/rt/views.py:183`
 - `hesma/rt/views.py:198`
 
-The parent simulation ID in the URL is ignored. A mismatched URL can download a
-file from another simulation if the child file ID is known.
+The parent simulation ID in the URL was ignored. A mismatched URL could download
+a file from another simulation if the child file ID was known.
 
-Recommended fix: fetch through the parent relation, as the interactive plot
-views already do.
+The download views now fetch child files through both the child file ID and the
+parent simulation ID, returning 404 for mismatched URLs. Regression tests cover
+hydro 1D files, RT lightcurve files, and RT spectrum files.
 
-### High: optional README fields are treated as mandatory
+### Fixed: optional README fields no longer crash download paths
 
-The models allow blank README files, but download and zip views access
+Status: fixed in the second critical-bug implementation pass.
+
+The models allow blank README files. Previously, download and zip views accessed
 `obj.readme.path` without checking whether a file exists:
 
 - `hesma/hydro/views.py:49`
@@ -356,9 +362,9 @@ The models allow blank README files, but download and zip views access
 - `hesma/rt/views.py:100`
 - `hesma/tracer/views.py:47`
 
-Recommended fix: either require README files with a migration after cleaning
-existing records, or make all download and zip paths skip missing README files
-and return 404 for direct README downloads.
+Direct README downloads now return 404 when no README exists. Hydro, RT, and
+tracer zip downloads skip missing README files while still returning `info.json`.
+Regression tests cover these paths.
 
 ### High: zip response construction is likely incorrect for non-streaming use
 
@@ -425,15 +431,17 @@ to render as literal JavaScript rather than template control flow.
 Recommended fix: simplify and test cookie banner rendering in a browser and with
 template tests.
 
-### Medium: public text contains typos
+### Fixed: public text typo cleanup
 
-The home page contains user-visible typos:
+Status: fixed in the second critical-bug implementation pass.
+
+The home page contained user-visible typos:
 
 - `Heidelber` should be `Heidelberg` at `hesma/templates/pages/home.html:16`.
 - `HEASMA` should be `HESMA` at `hesma/templates/pages/home.html:21`.
 
-Recommended fix: correct copy and scan the site for similar issues before
-release.
+These strings have been corrected. A broader copy review is still recommended
+before release.
 
 ### Medium: DOI field naming is unusual
 
@@ -490,9 +498,11 @@ README to match the production reality.
   added and passing.
 - Owner-only edit and child-file upload behavior. Initial regression tests added
   and passing.
-- Missing README behavior.
+- Missing README behavior. Initial regression tests added for direct README and
+  zip downloads.
 - Missing file behavior.
-- Mismatched parent/child download URLs.
+- Mismatched parent/child download URLs. Regression tests added for hydro 1D, RT
+  lightcurve, and RT spectrum downloads.
 - DOI and keyword modal behavior on edit pages. Upload-page metadata create
   permissions are covered; edit-page redirect behavior still needs coverage.
 - Contact form behavior with mocked email success and failure.
@@ -508,9 +518,10 @@ README to match the production reality.
   metadata create write paths.
 - Fix missing group handling. Done for upload selector rendering.
 - Fix tracer edit visibility. Done.
-- Fix parent/child download lookup.
-- Make README downloads safe.
-- Correct home page typos.
+- Fix parent/child download lookup. Done for hydro 1D, RT lightcurve, and RT
+  spectrum downloads.
+- Make README downloads safe. Done for direct README and zip downloads.
+- Correct home page typos. Done for the known typos.
 - Add tests for the above. Initial permission tests are done and passing in the
   Docker pipeline.
 

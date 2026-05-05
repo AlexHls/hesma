@@ -142,6 +142,17 @@ class HydroDownloadReadmeTestCase(HydroViewsTestCase):
             f"attachment; filename={self.simulation.readme.name}",
         )
 
+    def test_hydro_download_readme_missing_file(self):
+        simulation = HydroSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("hydro:hydro_download_readme", args=[simulation.id]))
+        with self.assertRaises(Http404):
+            hydro_download_readme(request, simulation.id)
+
 
 class HydroDownloadInfoTestCase(HydroViewsTestCase):
     def setUp(self):
@@ -162,6 +173,19 @@ class HydroDownloadInfoTestCase(HydroViewsTestCase):
             desired_file = "info.json"
             file_names_in_zip = zip_file.namelist()
             self.assertIn(desired_file, file_names_in_zip)
+
+    def test_hydro_download_info_skips_missing_readme(self):
+        simulation = HydroSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("hydro:hydro_download_info", args=[simulation.id]))
+        response = hydro_download_info(request, simulation.id)
+        self.assertEqual(response.status_code, 200)
+        with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
+            self.assertIn("info.json", zip_file.namelist())
 
 
 class HydroEditTestCase(HydroViewsTestCase):
@@ -269,3 +293,19 @@ class HydroDownloadHydro1DTestCase(HydroViewsTestCase):
             response.get("Content-Disposition"),
             f"attachment; filename={self.hydro1d_file.file.name}",
         )
+
+    def test_hydro_download_hydro1d_requires_matching_parent(self):
+        other_simulation = HydroSimulation.objects.create(
+            name="Other Simulation",
+            description="This is another simulation",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(
+            reverse(
+                "hydro:hydro_download_hydro1d",
+                args=[other_simulation.id, self.hydro1d_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            hydro_download_hydro1d(request, other_simulation.id, self.hydro1d_file.id)

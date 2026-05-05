@@ -148,6 +148,17 @@ class RTDownloadReadmeTestCase(RTSimulationTestCase):
             f"attachment; filename={self.simulation.readme.name}",
         )
 
+    def test_rt_download_readme_missing_file(self):
+        simulation = RTSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("rt:rt_download_readme", args=[simulation.id]))
+        with self.assertRaises(Http404):
+            rt_download_readme(request, simulation.id)
+
 
 class RTDownloadInfoTestCase(RTSimulationTestCase):
     def setUp(self):
@@ -168,6 +179,19 @@ class RTDownloadInfoTestCase(RTSimulationTestCase):
             desired_file = "info.json"
             file_names_in_zip = zip_file.namelist()
             self.assertIn(desired_file, file_names_in_zip)
+
+    def test_rt_download_info_skips_missing_readme(self):
+        simulation = RTSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("rt:rt_download_info", args=[simulation.id]))
+        response = rt_download_info(request, simulation.id)
+        self.assertEqual(response.status_code, 200)
+        with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
+            self.assertIn("info.json", zip_file.namelist())
 
 
 class RTEditTestCase(RTSimulationTestCase):
@@ -320,6 +344,22 @@ class RTDownloadLightcurveTestCase(RTSimulationTestCase):
             f"attachment; filename={self.lightcurve_file.file.name}",
         )
 
+    def test_rt_download_lightcurve_requires_matching_parent(self):
+        other_simulation = RTSimulation.objects.create(
+            name="Other Simulation",
+            description="This is another simulation",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(
+            reverse(
+                "rt:rt_download_lightcurve",
+                args=[other_simulation.id, self.lightcurve_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            rt_download_lightcurve(request, other_simulation.id, self.lightcurve_file.id)
+
 
 class RTDownloadSpectrumTestCase(RTSimulationTestCase):
     def setUp(self):
@@ -338,3 +378,19 @@ class RTDownloadSpectrumTestCase(RTSimulationTestCase):
             response.get("Content-Disposition"),
             f"attachment; filename={self.spectrum_file.file.name}",
         )
+
+    def test_rt_download_spectrum_requires_matching_parent(self):
+        other_simulation = RTSimulation.objects.create(
+            name="Other Simulation",
+            description="This is another simulation",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(
+            reverse(
+                "rt:rt_download_spectrum",
+                args=[other_simulation.id, self.spectrum_file.id],
+            )
+        )
+        with self.assertRaises(Http404):
+            rt_download_spectrum(request, other_simulation.id, self.spectrum_file.id)

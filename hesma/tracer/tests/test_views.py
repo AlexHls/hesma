@@ -138,6 +138,17 @@ class TracerDownloadReadmeTestCase(TestCase):
             f"attachment; filename={self.simulation.readme.name}",
         )
 
+    def test_tracer_download_readme_missing_file(self):
+        simulation = TracerSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("tracer:tracer_download_readme", args=[simulation.id]))
+        with self.assertRaises(Http404):
+            tracer_download_readme(request, simulation.id)
+
 
 class TracerDownloadInfoTestCase(TestCase):
     def setUp(self):
@@ -159,6 +170,17 @@ class TracerDownloadInfoTestCase(TestCase):
             response.get("Content-Disposition"),
             f"attachment; filename={self.simulation.name}.zip",
         )
+
+    def test_tracer_download_info_skips_missing_readme(self):
+        simulation = TracerSimulation.objects.create(
+            name="No README Simulation",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("tracer:tracer_download_info", args=[simulation.id]))
+        response = tracer_download_info(request, simulation.id)
+        self.assertEqual(response.status_code, 200)
 
 
 class TracerEditTestCase(TestCase):

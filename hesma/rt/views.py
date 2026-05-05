@@ -6,7 +6,7 @@ from wsgiref.util import FileWrapper
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, StreamingHttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from config.settings.base import STREAMING_CHUNK_SIZE
@@ -51,6 +51,8 @@ def rt_upload_view(request):
 
 def rt_download_readme(request, rtsimulation_id):
     obj = RTSimulation.objects.get(id=rtsimulation_id)
+    if not obj.readme:
+        raise Http404("RT simulation README does not exist")
     filename = os.path.basename(obj.readme.path)
     filepath = obj.readme.path
 
@@ -100,7 +102,8 @@ def rt_download_info(request, rtsimulation_id):
         ]
         selected_files.extend([file.file.path for file in rt_spectrum_files])
 
-    selected_files.append(obj.readme.path)
+    if obj.readme:
+        selected_files.append(obj.readme.path)
 
     json_file = StringIO()
     json.dump(json_data, json_file)
@@ -190,7 +193,11 @@ def rt_spectrum_interactive_plot(request, rtsimulation_id, rtsimulationspectrumf
 
 
 def rt_download_lightcurve(request, rtsimulation_id, rtsimulationlightcurvefile_id):
-    file = RTSimulationLightcurveFile.objects.get(id=rtsimulationlightcurvefile_id)
+    file = get_object_or_404(
+        RTSimulationLightcurveFile,
+        id=rtsimulationlightcurvefile_id,
+        rt_simulation_id=rtsimulation_id,
+    )
     filename = os.path.basename(file.file.path)
     filepath = file.file.path
 
@@ -205,7 +212,11 @@ def rt_download_lightcurve(request, rtsimulation_id, rtsimulationlightcurvefile_
 
 
 def rt_download_spectrum(request, rtsimulation_id, rtsimulationspectrumfile_id):
-    file = RTSimulationSpectrumFile.objects.get(id=rtsimulationspectrumfile_id)
+    file = get_object_or_404(
+        RTSimulationSpectrumFile,
+        id=rtsimulationspectrumfile_id,
+        rt_simulation_id=rtsimulation_id,
+    )
     filename = os.path.basename(file.file.path)
     filepath = file.file.path
 

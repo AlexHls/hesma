@@ -6,7 +6,7 @@ from wsgiref.util import FileWrapper
 
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, StreamingHttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from config.settings.base import STREAMING_CHUNK_SIZE
@@ -51,6 +51,8 @@ def hydro_upload_view(request):
 
 def hydro_download_readme(request, hydrosimulation_id):
     obj = HydroSimulation.objects.get(id=hydrosimulation_id)
+    if not obj.readme:
+        raise Http404("Hydro simulation README does not exist")
     filename = os.path.basename(obj.readme.path)
     filepath = obj.readme.path
 
@@ -88,7 +90,8 @@ def hydro_download_info(request, hydrosimulation_id):
     else:
         selected_files = []
 
-    selected_files.append(obj.readme.path)
+    if obj.readme:
+        selected_files.append(obj.readme.path)
 
     json_file = StringIO()
     json.dump(json_data, json_file)
@@ -144,7 +147,11 @@ def hydro_hydro1d_interactive_plot(request, hydrosimulation_id, hydrosimulation1
 
 
 def hydro_download_hydro1d(request, hydrosimulation_id, hydrosimulation1dmodelfile_id):
-    file = HydroSimulation1DModelFile.objects.get(id=hydrosimulation1dmodelfile_id)
+    file = get_object_or_404(
+        HydroSimulation1DModelFile,
+        id=hydrosimulation1dmodelfile_id,
+        hydro_simulation_id=hydrosimulation_id,
+    )
     filename = os.path.basename(file.file.path)
     filepath = file.file.path
 
