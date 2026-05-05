@@ -437,14 +437,16 @@ page weight and risks JavaScript conflicts.
 Recommended fix: standardize on Bootstrap 5 assets only, keep one modal-form
 integration, and load Plotly only on pages that render plots.
 
-### Medium: cookie-consent inline template appears malformed
+### Fixed: cookie-consent inline template no longer contains malformed tags
 
-The inline script in `hesma/templates/base.html:80` to `hesma/templates/base.html:114`
-contains spaced Django template delimiters like `{ % for ... % }`, which appear
-to render as literal JavaScript rather than template control flow.
+Status: fixed in the fifth bug-fix implementation pass.
 
-Recommended fix: simplify and test cookie banner rendering in a browser and with
-template tests.
+The inline script in `hesma/templates/base.html` previously contained spaced
+Django template delimiters like `{ % for ... % }`, which could render as literal
+JavaScript rather than template control flow when cookie groups were present.
+The cookie group loop now uses normal Django template syntax, and the cookie-bar
+HTML is escaped as a JavaScript string. A regression test checks that the base
+template no longer contains the malformed delimiter pattern.
 
 ### Fixed: public text typo cleanup
 
@@ -523,7 +525,9 @@ README to match the production reality.
   permissions and edit-page success URLs are covered; full modal integration
   testing in-browser is still useful.
 - Contact form behavior with mocked email success and failure.
-- Cookie banner template rendering.
+- Cookie banner template rendering. Source-level regression coverage was added
+  for the malformed template delimiter bug; browser-level behavior should still
+  be smoke-tested before release.
 - Realistic `hesmapy` validation behavior with small fixture files or mocks.
 - Migration tests for any release-critical schema changes.
 

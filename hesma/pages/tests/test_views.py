@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import RequestFactory, TestCase
@@ -109,6 +110,13 @@ class UploadSelectorViewTestCase(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse("upload"))
         self.assertContains(response, reverse("hydro:hydro_upload"))
+
+
+class BaseTemplateTestCase(TestCase):
+    def test_cookie_consent_script_has_no_malformed_template_tags(self):
+        template = (settings.APPS_DIR / "templates" / "base.html").read_text()
+        self.assertNotIn("{\n              %", template)
+        self.assertNotIn("%\n            }", template)
 
 
 class HomeViewTestCase(TestCase):
