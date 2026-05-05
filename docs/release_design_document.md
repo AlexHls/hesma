@@ -437,15 +437,19 @@ Status: fixed in the third bug-fix implementation pass.
 `timezone.localdate()`, avoiding date/datetime comparison problems. Regression
 tests use date values for today, future news, and old news.
 
-### Medium: base template includes duplicate and mixed Bootstrap assets
+### Fixed: base template no longer loads duplicate Bootstrap/modal scripts
 
-`hesma/templates/base.html` includes Bootstrap 5 from CDN, local Bootstrap JS,
-Popper, `bootstrap.bundle`, Bootstrap 4 modal form assets, Bootstrap 5 modal
-form assets, and both minified and non-minified modal scripts. This increases
-page weight and risks JavaScript conflicts.
+Status: fixed in the seventh bug-fix implementation pass.
 
-Recommended fix: standardize on Bootstrap 5 assets only, keep one modal-form
-integration, and load Plotly only on pages that render plots.
+`hesma/templates/base.html` previously included overlapping Bootstrap JavaScript
+and modal-form assets: CDN Bootstrap, local Bootstrap, `bootstrap.bundle`, a
+Bootstrap 4 modal helper, and both minified/non-minified Bootstrap 5 modal
+helpers. The base template now loads one ordered Bootstrap 5 path: jQuery,
+Popper, Bootstrap 5, and one Bootstrap 5 modal helper. A source-level regression
+test checks that the removed duplicate scripts do not return.
+
+Remaining improvement: load Plotly only on interactive plot pages instead of on
+every page.
 
 ### Fixed: cookie-consent inline template no longer contains malformed tags
 

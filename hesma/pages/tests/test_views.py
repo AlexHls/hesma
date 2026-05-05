@@ -121,6 +121,14 @@ class BaseTemplateTestCase(TestCase):
         self.assertNotIn("{\n              %", template)
         self.assertNotIn("%\n            }", template)
 
+    def test_base_template_does_not_load_duplicate_bootstrap_modal_scripts(self):
+        template = (settings.APPS_DIR / "templates" / "base.html").read_text()
+        self.assertNotIn("jquery.bootstrap.modal.forms.js", template)
+        self.assertNotIn("bootstrap.bundle.min.js", template)
+        self.assertNotIn("bootstrap5.modal.forms.min.js", template)
+        self.assertEqual(template.count("bootstrap.min.js"), 1)
+        self.assertEqual(template.count("bootstrap5.modal.forms.js"), 1)
+
 
 class HomeViewTestCase(TestCase):
     def setUp(self):
