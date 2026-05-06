@@ -51,6 +51,9 @@ coverage.xml
 *.pot
 
 # Django stuff:
+.env
+.pytest.sqlite3
+.test-media/
 staticfiles/
 
 # Sphinx documentation

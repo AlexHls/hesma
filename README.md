@@ -41,6 +41,46 @@ To run the tests, check your test coverage, and generate an HTML coverage report
 
     $ pytest
 
+#### Running tests from a regular shell
+
+The test suite can be run without entering the Docker container. Use an isolated
+Python environment and provide a `DATABASE_URL`, because the Django settings read
+the database configuration from the environment.
+
+The Docker image uses Python 3.11, so prefer the same version locally:
+
+    $ python3.11 -m venv .venv
+    $ source .venv/bin/activate
+    $ python -m pip install --upgrade pip
+    $ python -m pip install -r requirements/local.txt
+
+If `python3.11` is not installed, `python3 -m venv .venv` can be used instead.
+
+For quick local test runs, SQLite is usually enough:
+
+    $ export DATABASE_URL="sqlite:///${PWD}/.pytest.sqlite3"
+    $ export USE_DOCKER=no
+    $ python -m pytest --nomigrations
+
+The SQLite command uses `--nomigrations` so Django builds the test database from
+the current models instead of applying the PostgreSQL-oriented migration history.
+
+To keep the setting for later shells, create a local `.env` file instead:
+
+    $ printf 'USE_DOCKER=no\nDATABASE_URL=sqlite:///%s/.pytest.sqlite3\n' "$PWD" > .env
+    $ python -m pytest --nomigrations
+
+For a run that is closer to the Docker setup, use PostgreSQL instead of SQLite:
+
+    $ createdb hesma_test
+    $ export DATABASE_URL="postgres://localhost/hesma_test"
+    $ export USE_DOCKER=no
+    $ python -m pytest
+
+The local requirements use the binary psycopg package, so this setup does not
+require PostgreSQL or `pg_config` to be installed just to run the SQLite-backed
+tests.
+
 ### Live reloading and Sass CSS compilation
 
 Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/developing-locally.html#sass-compilation-live-reloading).
