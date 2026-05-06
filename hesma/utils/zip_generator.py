@@ -3,6 +3,7 @@ import zipfile
 from tempfile import SpooledTemporaryFile
 
 from django.http import HttpResponse, StreamingHttpResponse
+from django.utils.http import content_disposition_header
 
 from config.settings.base import STREAMING_CHUNK_SIZE
 
@@ -55,5 +56,5 @@ class ZipFileGenerator:
         else:
             response = HttpResponse(buffer.read(), content_type="application/x-zip-compressed")
         response["Content-Length"] = buff_size
-        response["Content-Disposition"] = f"attachment; filename={self.file_name}"
+        response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=self.file_name)
         return response

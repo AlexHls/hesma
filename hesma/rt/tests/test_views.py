@@ -8,6 +8,7 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 
 from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulationSpectrumFile
 from hesma.rt.views import (
@@ -145,7 +146,7 @@ class RTDownloadReadmeTestCase(RTSimulationTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.readme.name}",
+            content_disposition_header(as_attachment=True, filename=self.simulation.readme.name),
         )
 
     def test_rt_download_readme_missing_file(self):
@@ -182,7 +183,7 @@ class RTDownloadInfoTestCase(RTSimulationTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.name}.zip",
+            content_disposition_header(as_attachment=True, filename=f"{self.simulation.name}.zip"),
         )
         # This is sort of testing the contents twice. The zip generator test
         # already tests the contents of the zip file. This is just to make sure
@@ -376,7 +377,7 @@ class RTDownloadLightcurveTestCase(RTSimulationTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.lightcurve_file.file.name}",
+            content_disposition_header(as_attachment=True, filename=self.lightcurve_file.file.name),
         )
 
     def test_rt_download_lightcurve_requires_matching_parent(self):
@@ -423,7 +424,7 @@ class RTDownloadSpectrumTestCase(RTSimulationTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.spectrum_file.file.name}",
+            content_disposition_header(as_attachment=True, filename=self.spectrum_file.file.name),
         )
 
     def test_rt_download_spectrum_requires_matching_parent(self):

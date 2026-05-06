@@ -5,6 +5,7 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 
 from hesma.tracer.models import TracerSimulation
 from hesma.tracer.views import (
@@ -135,7 +136,7 @@ class TracerDownloadReadmeTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.readme.name}",
+            content_disposition_header(as_attachment=True, filename=self.simulation.readme.name),
         )
 
     def test_tracer_download_readme_missing_file(self):
@@ -180,7 +181,7 @@ class TracerDownloadInfoTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.name}.zip",
+            content_disposition_header(as_attachment=True, filename=f"{self.simulation.name}.zip"),
         )
 
     def test_tracer_download_info_skips_missing_readme(self):

@@ -26,6 +26,16 @@ class TracerSimulationFormTestCase(TestCase):
         form = TracerSimulationForm(data=form_data)
         self.assertTrue(form.is_valid())
 
+    def test_tracer_simulation_reference_assumes_https(self):
+        form_data = {
+            "name": "Test Simulation",
+            "description": "This is a test simulation",
+            "reference": "example.com/model",
+        }
+        form = TracerSimulationForm(data=form_data)
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["reference"], "https://example.com/model")
+
     def test_tracer_simulation_form_invalid(self):
         form_data = {
             "name": "",

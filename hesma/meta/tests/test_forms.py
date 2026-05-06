@@ -26,6 +26,18 @@ class DOIFormTestCase(TestCase):
         )
         self.assertTrue(form.is_valid())
 
+    def test_doi_form_assumes_https(self):
+        form = DOIForm(
+            {
+                "doi": "doi.org/10.48550/arXiv.2310.19670",
+                "author": "Test Author",
+                "title": "Test Title",
+                "date": datetime.date.today(),
+            }
+        )
+        self.assertTrue(form.is_valid())
+        self.assertEqual(form.cleaned_data["doi"], "https://doi.org/10.48550/arXiv.2310.19670")
+
     def test_doi_form_invalid(self):
         form = DOIForm(
             {

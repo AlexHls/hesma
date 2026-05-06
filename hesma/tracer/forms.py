@@ -7,6 +7,8 @@ from hesma.tracer.models import TracerSimulation
 
 
 class TracerSimulationForm(ModelForm):
+    reference = forms.URLField(assume_scheme="https", required=False)
+
     class Meta:
         model = TracerSimulation
         fields = "__all__"

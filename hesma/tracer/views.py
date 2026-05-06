@@ -7,6 +7,7 @@ from io import BytesIO, StringIO
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.http import content_disposition_header
 from django.utils import timezone
 
 from hesma.tracer.forms import TracerSimulationForm
@@ -56,7 +57,7 @@ def tracer_download_readme(request, tracersimulation_id):
     path = open(filepath)
     mime_type, _ = mimetypes.guess_type(filepath)
     response = HttpResponse(path, content_type=mime_type)
-    response["Content-Disposition"] = "attachment; filename=%s" % filename
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=filename)
 
     return response
 
@@ -93,7 +94,7 @@ def tracer_download_info(request, tracersimulation_id):
     # Grab ZIP file from in-memory, make response with correct MIME-type
     response = HttpResponse(s.getvalue(), content_type="application/x-zip-compressed")
     # ..and correct content-disposition
-    response["Content-Disposition"] = "attachment; filename=%s" % zip_filename
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=zip_filename)
 
     return response
 

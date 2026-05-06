@@ -8,6 +8,7 @@ from django.http import Http404
 from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import content_disposition_header
 
 from hesma.hydro.models import HydroSimulation, HydroSimulation1DModelFile
 from hesma.hydro.views import (
@@ -139,7 +140,7 @@ class HydroDownloadReadmeTestCase(HydroViewsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.readme.name}",
+            content_disposition_header(as_attachment=True, filename=self.simulation.readme.name),
         )
 
     def test_hydro_download_readme_missing_file(self):
@@ -176,7 +177,7 @@ class HydroDownloadInfoTestCase(HydroViewsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.simulation.name}.zip",
+            content_disposition_header(as_attachment=True, filename=f"{self.simulation.name}.zip"),
         )
         # This is sort of testing the contents twice. The zip generator test
         # already tests the contents of the zip file. This is just to make sure
@@ -320,7 +321,7 @@ class HydroDownloadHydro1DTestCase(HydroViewsTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.get("Content-Disposition"),
-            f"attachment; filename={self.hydro1d_file.file.name}",
+            content_disposition_header(as_attachment=True, filename=self.hydro1d_file.file.name),
         )
 
     def test_hydro_download_hydro1d_requires_matching_parent(self):

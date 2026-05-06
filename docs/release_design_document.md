@@ -400,6 +400,28 @@ tests verify that the non-streaming response body is valid zip content and that
 Remaining improvement: use one shared zip utility for tracer, hydro, and RT so
 archive generation behavior is fully consistent.
 
+### Fixed: attachment filenames use Django's Content-Disposition helper
+
+Status: fixed in the eighth bug-fix implementation pass.
+
+Direct README/data downloads and generated zip downloads now build
+`Content-Disposition` headers with Django's `content_disposition_header` helper
+instead of hand-written string interpolation. Regression tests compare response
+headers against the helper output, covering filenames with spaces such as
+`Test Simulation.zip`.
+
+### Fixed: current test-suite warnings cleaned up
+
+Status: fixed in the ninth bug-fix implementation pass.
+
+The test suite reported warnings for Django's upcoming URLField default-scheme
+change, WhiteNoise's missing test static root, and factory-boy's upcoming
+post-generation save behavior. HESMA now passes `assume_scheme="https"` on the
+URL form fields exposed by the simulation and DOI forms, points test
+`STATIC_ROOT` at an existing static directory, and updates `UserFactory` to save
+its post-generated password explicitly with `skip_postgeneration_save=True`.
+Regression tests verify HTTPS URL normalization and persisted factory passwords.
+
 ### High: expensive validation and plot generation happen during uploads
 
 Hydro and RT upload views call `hesmapy` validation and optional Plotly JSON
@@ -519,7 +541,7 @@ README to match the production reality.
   defined.
 - Store file metadata at upload time to avoid repeated filesystem calls.
 - Add content-disposition filename quoting for names with spaces or special
-  characters.
+  characters. Done for direct README/data downloads and generated zip downloads.
 - Close files consistently or use Django `FileResponse`.
 - Move Plotly loading out of the base template and into interactive plot pages.
   Done for hydro 1D, RT lightcurve, and RT spectrum plot pages.
@@ -549,6 +571,8 @@ README to match the production reality.
   be smoke-tested before release.
 - Realistic `hesmapy` validation behavior with small fixture files or mocks.
 - Migration tests for any release-critical schema changes.
+- Keep the test suite free of deprecation warnings where practical, especially
+  warnings for upcoming Django and factory-boy behavior changes.
 
 ## Suggested Release Roadmap
 
@@ -638,3 +662,4 @@ HESMA can be considered release-ready when:
 - Any migrations have been run successfully on a restored production database.
 - Known limitations are documented in user-facing docs or release notes.
 - The release process is repeatable by following a checked-in runbook.
+- The default test pipeline passes without unresolved project-owned warnings.

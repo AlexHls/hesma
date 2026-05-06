@@ -7,6 +7,8 @@ from hesma.rt.models import RTSimulation, RTSimulationLightcurveFile, RTSimulati
 
 
 class RTSimulationForm(ModelForm):
+    reference = forms.URLField(assume_scheme="https", required=False)
+
     class Meta:
         model = RTSimulation
         fields = "__all__"

@@ -7,6 +7,7 @@ from wsgiref.util import FileWrapper
 from django.contrib.auth.decorators import login_required
 from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.http import content_disposition_header
 from django.utils import timezone
 
 from config.settings.base import STREAMING_CHUNK_SIZE
@@ -58,7 +59,7 @@ def rt_download_readme(request, rtsimulation_id):
     path = open(filepath)
     mime_type, _ = mimetypes.guess_type(filepath)
     response = HttpResponse(path, content_type=mime_type)
-    response["Content-Disposition"] = "attachment; filename=%s" % filename
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=filename)
 
     return response
 
@@ -205,7 +206,7 @@ def rt_download_lightcurve(request, rtsimulation_id, rtsimulationlightcurvefile_
         content_type=mimetypes.guess_type(filepath)[0],
     )
     response["Content-Length"] = os.path.getsize(filepath)
-    response["Content-Disposition"] = f"attachment; filename={filename}"
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=filename)
 
     return response
 
@@ -224,6 +225,6 @@ def rt_download_spectrum(request, rtsimulation_id, rtsimulationspectrumfile_id):
         content_type=mimetypes.guess_type(filepath)[0],
     )
     response["Content-Length"] = os.path.getsize(filepath)
-    response["Content-Disposition"] = f"attachment; filename={filename}"
+    response["Content-Disposition"] = content_disposition_header(as_attachment=True, filename=filename)
 
     return response

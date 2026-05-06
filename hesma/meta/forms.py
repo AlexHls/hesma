@@ -1,15 +1,20 @@
 from bootstrap_modal_forms.forms import BSModalModelForm
+from django import forms
 
 from hesma.meta.models import DOI, Keyword
 
 
 class DOIForm(BSModalModelForm):
+    doi = forms.URLField(
+        assume_scheme="https",
+        label="DOI",
+        help_text="Enter a DOI to add to the database.",
+        error_messages={"unique": "This DOI is already in the database."},
+    )
+
     class Meta:
         model = DOI
         fields = ["doi", "author", "title", "date"]
-        labels = {"doi": "DOI"}
-        help_texts = {"doi": "Enter a DOI to add to the database."}
-        error_messages = {"doi": {"unique": "This DOI is already in the database."}}
 
 
 class KeywordForm(BSModalModelForm):

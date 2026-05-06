@@ -7,6 +7,8 @@ from hesma.meta.models import DOI, Keyword
 
 
 class HydroSimulationForm(ModelForm):
+    reference = forms.URLField(assume_scheme="https", required=False)
+
     class Meta:
         model = HydroSimulation
         fields = "__all__"
