@@ -48,12 +48,16 @@ def hydro_upload_view(request):
 
 def hydro_download_readme(request, hydrosimulation_id):
     obj = HydroSimulation.objects.get(id=hydrosimulation_id)
-    filename = os.path.basename(obj.readme.path)
+
+    if not obj.readme:
+        raise Http404("README does not exist")
+
+    filename = os.path.basename(obj.readme.name)
     filepath = obj.readme.path
 
-    path = open(filepath)
-    mime_type, _ = mimetypes.guess_type(filepath)
-    response = HttpResponse(path, content_type=mime_type)
+    with open(filepath, "rb") as path:
+        mime_type, _ = mimetypes.guess_type(filepath)
+        response = HttpResponse(path, content_type=mime_type)
     response["Content-Disposition"] = "attachment; filename=%s" % filename
 
     return response
@@ -85,7 +89,8 @@ def hydro_download_info(request, hydrosimulation_id):
     else:
         selected_files = []
 
-    selected_files.append(obj.readme.path)
+    if obj.readme:
+        selected_files.append(obj.readme.path)
 
     json_file = StringIO()
     json.dump(json_data, json_file)

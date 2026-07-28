@@ -122,6 +122,17 @@ class HydroDownloadReadmeTestCase(HydroViewsTestCase):
             f"attachment; filename={self.simulation.readme.name}",
         )
 
+    def test_hydro_download_readme_missing_file(self):
+        simulation_without_readme = HydroSimulation.objects.create(
+            name="Test Simulation Without README",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("hydro:hydro_download_readme", args=[simulation_without_readme.id]))
+        with self.assertRaises(Http404):
+            hydro_download_readme(request, simulation_without_readme.id)
+
 
 class HydroDownloadInfoTestCase(HydroViewsTestCase):
     def setUp(self):
@@ -142,6 +153,19 @@ class HydroDownloadInfoTestCase(HydroViewsTestCase):
             desired_file = "info.json"
             file_names_in_zip = zip_file.namelist()
             self.assertIn(desired_file, file_names_in_zip)
+
+    def test_hydro_download_info_without_readme(self):
+        simulation_without_readme = HydroSimulation.objects.create(
+            name="Test Simulation Without README",
+            description="This simulation has no README",
+            user=self.user,
+            date=timezone.now(),
+        )
+        request = self.factory.get(reverse("hydro:hydro_download_info", args=[simulation_without_readme.id]))
+        response = hydro_download_info(request, simulation_without_readme.id)
+        self.assertEqual(response.status_code, 200)
+        with zipfile.ZipFile(BytesIO(response.content), "r") as zip_file:
+            self.assertIn("info.json", zip_file.namelist())
 
 
 class HydroEditTestCase(HydroViewsTestCase):

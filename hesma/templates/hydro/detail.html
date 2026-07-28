@@ -19,8 +19,13 @@
         <b>Author: </b>{{ model.author }}
       </li>
       <li>
-        <b>README: </b><a href="{% url 'hydro:hydro_download_readme' model.id %}"
-   target="_blank">{{ model.readme }}</a>
+        <b>README: </b>
+        {% if model.readme %}
+          <a href="{% url 'hydro:hydro_download_readme' model.id %}"
+             target="_blank">{{ model.readme }}</a>
+        {% else %}
+          <span>None</span>
+        {% endif %}
       </li>
     </ul>
     <a href="{% url 'hydro:hydro_download_info' model.id %}"
